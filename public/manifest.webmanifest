@@ -1,0 +1,67 @@
+{
+  "name": "Posting Cinta - Monitoring Pertumbuhan Anak",
+  "short_name": "Posting Cinta",
+  "description": "PWA untuk monitoring pola makan dan pertumbuhan anak (stunting) — Posyandu/Puskesmas/Dinas. Aplikasi digital untuk ibu dan anak Indonesia.",
+  "lang": "id",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#ec4899",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/home.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Dashboard Posting Cinta"
+    }
+  ],
+  "categories": ["health", "education", "productivity", "lifestyle"],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Home",
+      "description": "Buka halaman utama",
+      "url": "/",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Data Anak",
+      "short_name": "Anak",
+      "description": "Lihat data anak",
+      "url": "/children",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Pengukuran",
+      "short_name": "Ukur",
+      "description": "Input pengukuran baru",
+      "url": "/measurements/create",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    }
+  ]
+}
