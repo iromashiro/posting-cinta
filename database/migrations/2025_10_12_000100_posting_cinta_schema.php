@@ -13,8 +13,8 @@ return new class extends Migration
             $table->id();
             $table->string('code', 50)->unique();
             $table->string('name', 255);
-            $table->text('address');
-            $table->string('district', 100);
+            $table->text('address')->nullable();
+            $table->string('district', 100)->nullable();
             $table->string('phone', 20)->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();

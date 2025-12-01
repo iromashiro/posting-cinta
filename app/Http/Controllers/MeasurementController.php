@@ -6,6 +6,7 @@ use App\Http\Requests\MeasurementRequest;
 use App\Models\Child;
 use App\Models\GrowthStandard;
 use App\Models\Measurement;
+use App\Models\Posyandu;
 use App\Notifications\MeasurementRecorded;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -13,18 +14,48 @@ use Illuminate\Support\Facades\Auth;
 
 class MeasurementController extends Controller
 {
+    /**
+     * Get posyandu IDs accessible by current user
+     */
+    private function getAccessiblePosyanduIds(): ?array
+    {
+        $user = Auth::user();
+
+        // Admin can see all
+        if ($user->role === 'admin') {
+            return null;
+        }
+
+        // Puskesmas user can only see posyandu under their puskesmas
+        if ($user->puskesmas_id) {
+            return Posyandu::where('puskesmas_id', $user->puskesmas_id)
+                ->pluck('id')
+                ->toArray();
+        }
+
+        return [];
+    }
+
     // GET /measurements
     public function index(Request $request)
     {
         $childId = $request->integer('child_id');
+        $accessiblePosyanduIds = $this->getAccessiblePosyanduIds();
+
         $items = Measurement::query()
+            ->when($accessiblePosyanduIds !== null, function ($q) use ($accessiblePosyanduIds) {
+                $q->whereHas('child', fn($c) => $c->whereIn('posyandu_id', $accessiblePosyanduIds));
+            })
             ->when($childId, fn($q) => $q->where('child_id', $childId))
             ->with(['child.mother', 'child.posyandu'])
             ->orderByDesc('measured_at')
             ->simplePaginate(15)
             ->appends($request->query());
 
-        $children = Child::orderBy('name')->get(['id', 'name']);
+        $children = Child::query()
+            ->when($accessiblePosyanduIds !== null, fn($q) => $q->whereIn('posyandu_id', $accessiblePosyanduIds))
+            ->orderBy('name')
+            ->get(['id', 'name']);
 
         return view('measurements.index', compact('items', 'children', 'childId'));
     }
@@ -32,7 +63,13 @@ class MeasurementController extends Controller
     // GET /measurements/create
     public function create(Request $request)
     {
-        $children = Child::orderBy('name')->get(['id', 'name']);
+        $accessiblePosyanduIds = $this->getAccessiblePosyanduIds();
+
+        $children = Child::query()
+            ->when($accessiblePosyanduIds !== null, fn($q) => $q->whereIn('posyandu_id', $accessiblePosyanduIds))
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
         $prefillChildId = $request->integer('child_id') ?: null;
 
         return view('measurements.create', compact('children', 'prefillChildId'));
@@ -44,6 +81,12 @@ class MeasurementController extends Controller
         $data = $request->validated();
 
         $child = Child::with('creator')->findOrFail($data['child_id']);
+
+        // Check access
+        $accessiblePosyanduIds = $this->getAccessiblePosyanduIds();
+        if ($accessiblePosyanduIds !== null && !in_array($child->posyandu_id, $accessiblePosyanduIds)) {
+            abort(403, 'Anda tidak memiliki akses ke data anak ini.');
+        }
 
         // Derive age in months using measured_at vs DOB
         $measuredAt = Carbon::parse($data['measured_at'])->startOfDay();
@@ -88,21 +131,53 @@ class MeasurementController extends Controller
     public function show(Measurement $measurement)
     {
         $measurement->load('child.mother', 'child.posyandu');
+
+        // Check access
+        $accessiblePosyanduIds = $this->getAccessiblePosyanduIds();
+        if ($accessiblePosyanduIds !== null && !in_array($measurement->child->posyandu_id, $accessiblePosyanduIds)) {
+            abort(403, 'Anda tidak memiliki akses ke data ini.');
+        }
+
         return view('measurements.show', compact('measurement'));
     }
 
     // GET /measurements/{measurement}/edit
     public function edit(Measurement $measurement)
     {
-        $children = Child::orderBy('name')->get(['id', 'name']);
+        $measurement->load('child');
+
+        // Check access
+        $accessiblePosyanduIds = $this->getAccessiblePosyanduIds();
+        if ($accessiblePosyanduIds !== null && !in_array($measurement->child->posyandu_id, $accessiblePosyanduIds)) {
+            abort(403, 'Anda tidak memiliki akses ke data ini.');
+        }
+
+        $children = Child::query()
+            ->when($accessiblePosyanduIds !== null, fn($q) => $q->whereIn('posyandu_id', $accessiblePosyanduIds))
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
         return view('measurements.edit', compact('measurement', 'children'));
     }
 
     // PUT/PATCH /measurements/{measurement}
     public function update(MeasurementRequest $request, Measurement $measurement)
     {
+        $measurement->load('child');
+
+        // Check access
+        $accessiblePosyanduIds = $this->getAccessiblePosyanduIds();
+        if ($accessiblePosyanduIds !== null && !in_array($measurement->child->posyandu_id, $accessiblePosyanduIds)) {
+            abort(403, 'Anda tidak memiliki akses ke data ini.');
+        }
+
         $data = $request->validated();
         $child = Child::findOrFail($data['child_id']);
+
+        // Verify child is accessible
+        if ($accessiblePosyanduIds !== null && !in_array($child->posyandu_id, $accessiblePosyanduIds)) {
+            abort(403, 'Anda tidak memiliki akses ke data anak ini.');
+        }
 
         $measuredAt = Carbon::parse($data['measured_at'])->startOfDay();
         $dob = Carbon::parse($child->date_of_birth)->startOfDay();
@@ -129,6 +204,14 @@ class MeasurementController extends Controller
     // DELETE /measurements/{measurement}
     public function destroy(Measurement $measurement)
     {
+        $measurement->load('child');
+
+        // Check access
+        $accessiblePosyanduIds = $this->getAccessiblePosyanduIds();
+        if ($accessiblePosyanduIds !== null && !in_array($measurement->child->posyandu_id, $accessiblePosyanduIds)) {
+            abort(403, 'Anda tidak memiliki akses ke data ini.');
+        }
+
         $child = $measurement->child;
         $measurement->delete();
         return redirect()->route('children.show', $child)->with('success', 'Pengukuran berhasil dihapus.');

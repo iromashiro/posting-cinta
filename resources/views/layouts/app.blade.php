@@ -189,6 +189,14 @@
                     </div>
                     <span class="text-sm">Posyandu</span>
                 </a>
+                <a href="{{ route('users.index') }}"
+                    class="flex items-center gap-3 px-5 py-4 hover:bg-gradient-to-r hover:from-pink-50 hover:to-purple-50 border-b-2 border-gray-100 transition-all group {{ request()->routeIs('users.*') ? 'bg-gradient-to-r from-pink-100 to-purple-100 text-pink-600 font-bold' : 'text-gray-700' }}">
+                    <div
+                        class="w-10 h-10 rounded-xl flex items-center justify-center {{ request()->routeIs('users.*') ? 'bg-white shadow-md' : 'bg-gray-100 group-hover:bg-white group-hover:shadow' }} transition-all">
+                        <span class="text-xl">👥</span>
+                    </div>
+                    <span class="text-sm">{{ Auth::user()->role === 'admin' ? 'User' : 'Kader' }}</span>
+                </a>
                 <a href="{{ route('recipes.index') }}"
                     class="flex items-center gap-3 px-5 py-4 hover:bg-gradient-to-r hover:from-pink-50 hover:to-purple-50 border-b-2 border-gray-100 transition-all group {{ request()->routeIs('recipes.*') ? 'bg-gradient-to-r from-pink-100 to-purple-100 text-pink-600 font-bold' : 'text-gray-700' }}">
                     <div
@@ -282,6 +290,11 @@
                     <span class="text-2xl">🏥</span>
                     <span>Posyandu</span>
                 </a>
+                <a href="{{ route('users.index') }}" @click="sidebar = false"
+                    class="flex items-center gap-4 px-4 py-4 rounded-2xl mb-2 transition-all {{ request()->routeIs('users.*') ? 'bg-gradient-to-r from-pink-100 to-purple-100 text-pink-600 font-bold shadow-md' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <span class="text-2xl">👥</span>
+                    <span>{{ Auth::user()->role === 'admin' ? 'User' : 'Kader' }}</span>
+                </a>
                 <a href="{{ route('recipes.index') }}" @click="sidebar = false"
                     class="flex items-center gap-4 px-4 py-4 rounded-2xl mb-2 transition-all {{ request()->routeIs('recipes.*') ? 'bg-gradient-to-r from-pink-100 to-purple-100 text-pink-600 font-bold shadow-md' : 'text-gray-700 hover:bg-gray-50' }}">
                     <span class="text-2xl">🍲</span>
@@ -317,6 +330,23 @@
                 </div>
                 <button @click="show = false"
                     class="flex-shrink-0 text-green-600 hover:text-green-800 p-2 hover:bg-green-100 rounded-xl transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            @endif
+
+            @if (session('error'))
+            <div x-data="{ show: true }" x-show="show" x-transition
+                class="mb-6 rounded-3xl border-4 border-red-200 bg-gradient-to-r from-red-50 to-rose-50 px-6 py-5 flex items-start gap-4 shadow-xl">
+                <div class="flex-shrink-0 text-3xl">❌</div>
+                <div class="flex-1 text-red-800 font-semibold">
+                    {{ session('error') }}
+                </div>
+                <button @click="show = false"
+                    class="flex-shrink-0 text-red-600 hover:text-red-800 p-2 hover:bg-red-100 rounded-xl transition-all">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
@@ -404,6 +434,9 @@
         </p>
         <p class="text-xs text-gray-400 mt-2">Dinas Ketahanan Pangan Kab. Muara Enim</p>
     </footer>
+
+    <!-- Page Scripts -->
+    @stack('scripts')
 </body>
 
 </html>

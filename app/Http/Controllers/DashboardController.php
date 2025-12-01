@@ -12,27 +12,67 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index()
+    /**
+     * Get posyandu IDs accessible by current user
+     */
+    private function getAccessiblePosyanduIds(): ?array
     {
         $user = Auth::user();
 
-        // Stats dasar
+        // Admin can see all
+        if ($user->role === 'admin') {
+            return null;
+        }
+
+        // Puskesmas user can only see posyandu under their puskesmas
+        if ($user->puskesmas_id) {
+            return Posyandu::where('puskesmas_id', $user->puskesmas_id)
+                ->pluck('id')
+                ->toArray();
+        }
+
+        return [];
+    }
+
+    public function index()
+    {
+        $user = Auth::user();
+        $accessiblePosyanduIds = $this->getAccessiblePosyanduIds();
+
+        // Stats dasar - filter berdasarkan akses puskesmas
         $stats = [
-            'total_anak' => Child::count(),
-            'total_ibu' => Mother::count(),
-            'total_posyandu' => Posyandu::count(),
-            'total_pengukuran' => Measurement::count(),
+            'total_anak' => Child::query()
+                ->when($accessiblePosyanduIds !== null, fn($q) => $q->whereIn('posyandu_id', $accessiblePosyanduIds))
+                ->count(),
+            'total_ibu' => Mother::query()
+                ->when($accessiblePosyanduIds !== null, fn($q) => $q->whereIn('posyandu_id', $accessiblePosyanduIds))
+                ->count(),
+            'total_posyandu' => Posyandu::query()
+                ->when($accessiblePosyanduIds !== null, fn($q) => $q->whereIn('id', $accessiblePosyanduIds))
+                ->count(),
+            'total_pengukuran' => Measurement::query()
+                ->when($accessiblePosyanduIds !== null, function ($q) use ($accessiblePosyanduIds) {
+                    $q->whereHas('child', fn($c) => $c->whereIn('posyandu_id', $accessiblePosyanduIds));
+                })
+                ->count(),
         ];
 
-        // Stats gizi berdasarkan pengukuran terakhir
-        // Stats gizi per kategori UI (berdasarkan pengukuran terakhir per anak, by measured_at)
-        $latest = Measurement::select('child_id', DB::raw('MAX(measured_at) as max_date'))
+        // Stats gizi berdasarkan pengukuran terakhir - dengan filter puskesmas
+        $latestQuery = Measurement::query()
+            ->when($accessiblePosyanduIds !== null, function ($q) use ($accessiblePosyanduIds) {
+                $q->whereHas('child', fn($c) => $c->whereIn('posyandu_id', $accessiblePosyanduIds));
+            })
+            ->select('child_id', DB::raw('MAX(measured_at) as max_date'))
             ->groupBy('child_id');
 
-        $giziRaw = Measurement::joinSub($latest, 'latest', function ($join) {
-            $join->on('measurements.child_id', '=', 'latest.child_id')
-                ->on('measurements.measured_at', '=', 'latest.max_date');
-        })
+        $giziRaw = Measurement::query()
+            ->when($accessiblePosyanduIds !== null, function ($q) use ($accessiblePosyanduIds) {
+                $q->whereHas('child', fn($c) => $c->whereIn('posyandu_id', $accessiblePosyanduIds));
+            })
+            ->joinSub($latestQuery, 'latest', function ($join) {
+                $join->on('measurements.child_id', '=', 'latest.child_id')
+                    ->on('measurements.measured_at', '=', 'latest.max_date');
+            })
             ->select('measurements.nutrition_status', DB::raw('COUNT(*) as total'))
             ->groupBy('measurements.nutrition_status')
             ->pluck('total', 'measurements.nutrition_status')
@@ -46,14 +86,22 @@ class DashboardController extends Controller
             'berisiko_gizi_lebih' => $giziRaw['overweight'] ?? 0,
             'gizi_lebih' => $giziRaw['obesity'] ?? 0,
         ];
+
         // Fallback: jika hasil 0 semua (mis. join by measured_at tidak match), gunakan pendekatan MAX(id)
         if (array_sum($giziStats) === 0) {
-            $giziRaw = Measurement::select('nutrition_status', DB::raw('count(*) as total'))
-                ->whereIn('id', function ($query) {
-                    $query->select(DB::raw('MAX(id)'))
-                        ->from('measurements')
-                        ->groupBy('child_id');
+            $subQuery = Measurement::query()
+                ->when($accessiblePosyanduIds !== null, function ($q) use ($accessiblePosyanduIds) {
+                    $q->whereHas('child', fn($c) => $c->whereIn('posyandu_id', $accessiblePosyanduIds));
                 })
+                ->select(DB::raw('MAX(id) as max_id'))
+                ->groupBy('child_id');
+
+            $giziRaw = Measurement::query()
+                ->when($accessiblePosyanduIds !== null, function ($q) use ($accessiblePosyanduIds) {
+                    $q->whereHas('child', fn($c) => $c->whereIn('posyandu_id', $accessiblePosyanduIds));
+                })
+                ->whereIn('id', $subQuery->pluck('max_id'))
+                ->select('nutrition_status', DB::raw('count(*) as total'))
                 ->groupBy('nutrition_status')
                 ->pluck('total', 'nutrition_status')
                 ->toArray();
@@ -67,8 +115,11 @@ class DashboardController extends Controller
             ];
         }
 
-        // Pengukuran terbaru (urut berdasarkan tanggal ukur)
+        // Pengukuran terbaru (urut berdasarkan tanggal ukur) - dengan filter puskesmas
         $recentMeasurements = Measurement::with(['child', 'child.mother'])
+            ->when($accessiblePosyanduIds !== null, function ($q) use ($accessiblePosyanduIds) {
+                $q->whereHas('child', fn($c) => $c->whereIn('posyandu_id', $accessiblePosyanduIds));
+            })
             ->orderByDesc('measured_at')
             ->take(5)
             ->get();

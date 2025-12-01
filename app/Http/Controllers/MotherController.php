@@ -10,13 +10,38 @@ use Illuminate\Support\Facades\Auth;
 
 class MotherController extends Controller
 {
+    /**
+     * Get posyandu IDs accessible by current user
+     */
+    private function getAccessiblePosyanduIds(): ?array
+    {
+        $user = Auth::user();
+
+        // Admin can see all
+        if ($user->role === 'admin') {
+            return null;
+        }
+
+        // Puskesmas user can only see posyandu under their puskesmas
+        if ($user->puskesmas_id) {
+            return Posyandu::where('puskesmas_id', $user->puskesmas_id)
+                ->pluck('id')
+                ->toArray();
+        }
+
+        return [];
+    }
+
     // GET /mothers
     public function index(Request $request)
     {
         $q = $request->string('q')->toString();
         $posyanduId = $request->integer('posyandu_id');
 
+        $accessiblePosyanduIds = $this->getAccessiblePosyanduIds();
+
         $items = Mother::query()
+            ->when($accessiblePosyanduIds !== null, fn($qb) => $qb->whereIn('posyandu_id', $accessiblePosyanduIds))
             ->when($q, function ($qb) use ($q) {
                 $qb->where(function ($w) use ($q) {
                     $w->where('name', 'like', "%{$q}%")
@@ -30,7 +55,10 @@ class MotherController extends Controller
             ->simplePaginate(15)
             ->appends($request->query());
 
-        $posyandus = Posyandu::orderBy('name')->get(['id', 'name']);
+        $posyandus = Posyandu::query()
+            ->when($accessiblePosyanduIds !== null, fn($q) => $q->whereIn('id', $accessiblePosyanduIds))
+            ->orderBy('name')
+            ->get(['id', 'name']);
 
         return view('mothers.index', compact('items', 'q', 'posyanduId', 'posyandus'));
     }
@@ -38,7 +66,13 @@ class MotherController extends Controller
     // GET /mothers/create
     public function create()
     {
-        $posyandus = Posyandu::orderBy('name')->get(['id', 'name']);
+        $accessiblePosyanduIds = $this->getAccessiblePosyanduIds();
+
+        $posyandus = Posyandu::query()
+            ->when($accessiblePosyanduIds !== null, fn($q) => $q->whereIn('id', $accessiblePosyanduIds))
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
         return view('mothers.create', compact('posyandus'));
     }
 
@@ -46,6 +80,13 @@ class MotherController extends Controller
     public function store(MotherRequest $request)
     {
         $data = $request->validated();
+
+        // Verify posyandu is accessible
+        $accessiblePosyanduIds = $this->getAccessiblePosyanduIds();
+        if ($accessiblePosyanduIds !== null && !in_array($data['posyandu_id'], $accessiblePosyanduIds)) {
+            abort(403, 'Anda tidak memiliki akses ke posyandu ini.');
+        }
+
         $data['created_by'] = Auth::id() ?? 1;
 
         $item = Mother::create($data);
@@ -55,6 +96,12 @@ class MotherController extends Controller
     // GET /mothers/{mother}
     public function show(Mother $mother)
     {
+        // Check access
+        $accessiblePosyanduIds = $this->getAccessiblePosyanduIds();
+        if ($accessiblePosyanduIds !== null && !in_array($mother->posyandu_id, $accessiblePosyanduIds)) {
+            abort(403, 'Anda tidak memiliki akses ke data ini.');
+        }
+
         $mother->load(['posyandu', 'children']);
         return view('mothers.show', compact('mother'));
     }
@@ -62,14 +109,38 @@ class MotherController extends Controller
     // GET /mothers/{mother}/edit
     public function edit(Mother $mother)
     {
-        $posyandus = Posyandu::orderBy('name')->get(['id', 'name']);
+        $accessiblePosyanduIds = $this->getAccessiblePosyanduIds();
+
+        // Check access
+        if ($accessiblePosyanduIds !== null && !in_array($mother->posyandu_id, $accessiblePosyanduIds)) {
+            abort(403, 'Anda tidak memiliki akses ke data ini.');
+        }
+
+        $posyandus = Posyandu::query()
+            ->when($accessiblePosyanduIds !== null, fn($q) => $q->whereIn('id', $accessiblePosyanduIds))
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
         return view('mothers.edit', compact('mother', 'posyandus'));
     }
 
     // PUT/PATCH /mothers/{mother}
     public function update(MotherRequest $request, Mother $mother)
     {
+        $accessiblePosyanduIds = $this->getAccessiblePosyanduIds();
+
+        // Check access
+        if ($accessiblePosyanduIds !== null && !in_array($mother->posyandu_id, $accessiblePosyanduIds)) {
+            abort(403, 'Anda tidak memiliki akses ke data ini.');
+        }
+
         $data = $request->validated();
+
+        // Verify new posyandu is accessible
+        if ($accessiblePosyanduIds !== null && !in_array($data['posyandu_id'], $accessiblePosyanduIds)) {
+            abort(403, 'Anda tidak memiliki akses ke posyandu ini.');
+        }
+
         $mother->update($data);
         return redirect()->route('mothers.show', $mother)->with('success', 'Ibu berhasil diperbarui.');
     }
@@ -77,6 +148,13 @@ class MotherController extends Controller
     // DELETE /mothers/{mother}
     public function destroy(Mother $mother)
     {
+        $accessiblePosyanduIds = $this->getAccessiblePosyanduIds();
+
+        // Check access
+        if ($accessiblePosyanduIds !== null && !in_array($mother->posyandu_id, $accessiblePosyanduIds)) {
+            abort(403, 'Anda tidak memiliki akses ke data ini.');
+        }
+
         $mother->delete();
         return redirect()->route('mothers.index')->with('success', 'Ibu berhasil dihapus.');
     }

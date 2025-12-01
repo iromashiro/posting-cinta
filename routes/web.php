@@ -10,6 +10,7 @@ use App\Http\Controllers\MeasurementController;
 use App\Http\Controllers\GrowthStandardController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\GrowthChartController;
+use App\Http\Controllers\UserController;
 
 // Guest routes
 Route::middleware('guest')->group(function () {
@@ -30,6 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('mothers', MotherController::class);
     Route::resource('children', ChildController::class);
     Route::resource('measurements', MeasurementController::class);
+    Route::resource('users', UserController::class);
 
     // Growth chart (WHO) per anak
     Route::get('/children/{child}/growth-chart', [GrowthChartController::class, 'show'])->name('growth-chart.show');

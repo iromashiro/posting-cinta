@@ -1,14 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
-@php($header = '👶 Tambah Anak Baru')
+@php
+$header = '➕ Tambah Anak Baru';
+@endphp
 
 <div class="card-cute">
     <!-- Header dengan ilustrasi -->
     <div class="mb-6 text-center">
-        <div class="text-5xl mb-3">👶💕</div>
-        <h2 class="text-xl font-semibold text-slate-800 mb-1">Daftarkan Anak Baru</h2>
-        <p class="text-sm text-slate-600">Lengkapi data anak untuk mulai memantau tumbuh kembangnya</p>
+        <div class="text-5xl mb-3">👶✨</div>
+        <h2 class="text-xl font-semibold text-slate-800 mb-1">Tambah Data Anak</h2>
+        <p class="text-sm text-slate-600">Daftarkan anak baru untuk pemantauan pertumbuhan</p>
     </div>
 
     <form method="post" action="{{ route('children.store') }}" class="space-y-6">
@@ -19,48 +21,132 @@
             <div class="flex items-start gap-3">
                 <div class="text-2xl">💡</div>
                 <div class="flex-1 text-sm text-blue-800">
-                    <strong>Tips:</strong> Pastikan data yang dimasukkan akurat untuk hasil pemantauan yang tepat. Data
-                    bertanda <span class="text-rose-600 font-bold">*</span> wajib diisi.
+                    <strong>Tips:</strong> Pastikan data yang dimasukkan sudah benar. Data bertanda <span
+                        class="text-rose-600 font-bold">*</span> wajib diisi.
                 </div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Posyandu -->
-            <div>
+            <!-- Posyandu - Searchable -->
+            <div x-data="searchableSelect({
+                items: {{ Js::from($posyandus->map(fn($p) => ['id' => $p->id, 'name' => $p->name])) }},
+                selected: {{ old('posyandu_id') ?? 'null' }},
+                inputName: 'posyandu_id',
+                placeholder: 'Cari posyandu...',
+                limitBeforeSearch: 10
+            })">
                 <label class="form-label">
                     <span class="flex items-center gap-2">
                         <span>🏥</span>
                         <span>Posyandu <span class="text-rose-600">*</span></span>
                     </span>
                 </label>
-                <select name="posyandu_id" class="input-field @error('posyandu_id') input-error @enderror">
-                    <option value="">Pilih Posyandu</option>
-                    @foreach ($posyandus as $p)
-                    <option value="{{ $p->id }}" @selected(old('posyandu_id', $prefill['posyandu_id'] ?? null)==$p->
-                        id)>{{ $p->name }}</option>
-                    @endforeach
-                </select>
-                <p class="form-helper">Posyandu tempat anak terdaftar</p>
+                <div class="relative">
+                    <input type="hidden" :name="inputName" :value="selectedId">
+                    <button type="button" @click="open = !open"
+                        class="input-field text-left flex items-center justify-between @error('posyandu_id') input-error @enderror">
+                        <span x-text="selectedName || 'Pilih Posyandu'"
+                            :class="!selectedName && 'text-slate-400'"></span>
+                        <svg class="w-5 h-5 text-slate-400 transition-transform" :class="open && 'rotate-180'"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+
+                    <div x-show="open" @click.away="open = false" x-transition
+                        class="absolute z-50 w-full mt-1 bg-white border-2 border-slate-200 rounded-xl shadow-lg max-h-60 overflow-hidden">
+                        <div class="p-2 border-b border-slate-100">
+                            <input type="text" x-model="search" x-ref="searchInput" @keydown.escape="open = false"
+                                placeholder="Ketik untuk mencari..."
+                                class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400">
+                        </div>
+                        <ul class="max-h-48 overflow-y-auto">
+                            <template x-for="item in displayItems" :key="item.id">
+                                <li @click="selectItem(item)"
+                                    class="px-4 py-2 cursor-pointer hover:bg-brand-50 flex items-center gap-2"
+                                    :class="selectedId == item.id && 'bg-brand-100 text-brand-700'">
+                                    <span x-text="item.name"></span>
+                                    <svg x-show="selectedId == item.id" class="w-4 h-4 text-brand-600 ml-auto"
+                                        fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </li>
+                            </template>
+                            <li x-show="displayItems.length === 0" class="px-4 py-3 text-sm text-slate-500 text-center">
+                                Tidak ada hasil ditemukan
+                            </li>
+                            <li x-show="!search && items.length > limitBeforeSearch"
+                                class="px-4 py-2 text-xs text-slate-400 text-center bg-slate-50 border-t">
+                                <span x-text="'Ketik untuk mencari dari ' + items.length + ' data'"></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="form-helper">Posyandu tempat anak akan didaftarkan</p>
                 @error('posyandu_id') <div class="error-message">{{ $message }}</div> @enderror
             </div>
 
-            <!-- Ibu -->
-            <div>
+            <!-- Ibu - Searchable (Limited to 5 before search) -->
+            <div x-data="searchableSelect({
+                items: {{ Js::from($mothers->map(fn($m) => ['id' => $m->id, 'name' => $m->name, 'posyandu_id' => $m->posyandu_id])) }},
+                selected: {{ old('mother_id') ?? 'null' }},
+                inputName: 'mother_id',
+                placeholder: 'Cari ibu...',
+                limitBeforeSearch: 5
+            })">
                 <label class="form-label">
                     <span class="flex items-center gap-2">
                         <span>👩</span>
                         <span>Nama Ibu <span class="text-rose-600">*</span></span>
                     </span>
                 </label>
-                <select name="mother_id" class="input-field @error('mother_id') input-error @enderror">
-                    <option value="">Pilih Ibu</option>
-                    @foreach ($mothers as $m)
-                    <option value="{{ $m->id }}" @selected(old('mother_id', $prefill['mother_id'] ?? null)==$m->
-                        id)>{{ $m->name }}</option>
-                    @endforeach
-                </select>
-                <p class="form-helper">Ibu dari anak ini</p>
+                <div class="relative">
+                    <input type="hidden" :name="inputName" :value="selectedId">
+                    <button type="button" @click="open = !open"
+                        class="input-field text-left flex items-center justify-between @error('mother_id') input-error @enderror">
+                        <span x-text="selectedName || 'Pilih Ibu'" :class="!selectedName && 'text-slate-400'"></span>
+                        <svg class="w-5 h-5 text-slate-400 transition-transform" :class="open && 'rotate-180'"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+
+                    <div x-show="open" @click.away="open = false" x-transition
+                        class="absolute z-50 w-full mt-1 bg-white border-2 border-slate-200 rounded-xl shadow-lg max-h-60 overflow-hidden">
+                        <div class="p-2 border-b border-slate-100">
+                            <input type="text" x-model="search" x-ref="searchInput" @keydown.escape="open = false"
+                                placeholder="Ketik nama ibu untuk mencari..."
+                                class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400">
+                        </div>
+                        <ul class="max-h-48 overflow-y-auto">
+                            <template x-for="item in displayItems" :key="item.id">
+                                <li @click="selectItem(item)"
+                                    class="px-4 py-2 cursor-pointer hover:bg-brand-50 flex items-center gap-2"
+                                    :class="selectedId == item.id && 'bg-brand-100 text-brand-700'">
+                                    <span x-text="item.name"></span>
+                                    <svg x-show="selectedId == item.id" class="w-4 h-4 text-brand-600 ml-auto"
+                                        fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </li>
+                            </template>
+                            <li x-show="displayItems.length === 0 && search"
+                                class="px-4 py-3 text-sm text-slate-500 text-center">
+                                Tidak ada hasil ditemukan
+                            </li>
+                            <li x-show="!search && items.length > limitBeforeSearch"
+                                class="px-4 py-2 text-xs text-slate-400 text-center bg-slate-50 border-t">
+                                <span x-text="'Ketik untuk mencari dari ' + items.length + ' data ibu'"></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="form-helper">Ibu dari anak yang akan didaftarkan</p>
                 @error('mother_id') <div class="error-message">{{ $message }}</div> @enderror
             </div>
 
@@ -104,13 +190,13 @@
                     <label class="inline-flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="gender" value="male"
                             class="w-4 h-4 text-brand-500 border-slate-300 focus:ring-brand-400"
-                            @checked(old('gender')==='male' )>
+                            {{ old('gender') === 'male' ? 'checked' : '' }}>
                         <span class="text-sm font-medium text-slate-700">👦 Laki-laki</span>
                     </label>
                     <label class="inline-flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="gender" value="female"
                             class="w-4 h-4 text-brand-500 border-slate-300 focus:ring-brand-400"
-                            @checked(old('gender')==='female' )>
+                            {{ old('gender') === 'female' ? 'checked' : '' }}>
                         <span class="text-sm font-medium text-slate-700">👧 Perempuan</span>
                     </label>
                 </div>
@@ -136,7 +222,7 @@
         <!-- Action Buttons -->
         <div class="pt-4 flex items-center gap-3 border-t border-slate-200">
             <a href="{{ route('children.index') }}" class="btn-secondary">
-                <span>← Kembali</span>
+                <span>← Batal</span>
             </a>
             <button type="submit" class="btn-primary">
                 <span>💾 Simpan Data Anak</span>
@@ -145,13 +231,64 @@
     </form>
 </div>
 
-<!-- Decorative Elements -->
-<div class="fixed bottom-4 right-4 text-6xl opacity-10 pointer-events-none animate-float"
-    style="animation-delay: 0.5s;">
-    🍼
-</div>
-<div class="fixed top-20 right-20 text-4xl opacity-10 pointer-events-none animate-float" style="animation-delay: 1s;">
-    ✨
-</div>
-
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('alpine:init', () => {
+    Alpine.data('searchableSelect', (config) => ({
+        items: config.items || [],
+        selectedId: config.selected,
+        selectedName: '',
+        inputName: config.inputName || 'select',
+        placeholder: config.placeholder || 'Search...',
+        limitBeforeSearch: config.limitBeforeSearch || 10,
+        search: '',
+        open: false,
+
+        init() {
+            // Set initial selected name
+            if (this.selectedId) {
+                const found = this.items.find(item => item.id == this.selectedId);
+                if (found) this.selectedName = found.name;
+            }
+
+            // Focus search input when dropdown opens
+            this.$watch('open', (value) => {
+                if (value) {
+                    this.$nextTick(() => {
+                        this.$refs.searchInput?.focus();
+                    });
+                } else {
+                    this.search = '';
+                }
+            });
+        },
+
+        get filteredItems() {
+            if (!this.search) return this.items;
+            const searchLower = this.search.toLowerCase();
+            return this.items.filter(item =>
+                item.name.toLowerCase().includes(searchLower)
+            );
+        },
+
+        get displayItems() {
+            // If searching, show all filtered results
+            if (this.search) {
+                return this.filteredItems;
+            }
+            // If not searching, limit to configured amount
+            return this.items.slice(0, this.limitBeforeSearch);
+        },
+
+        selectItem(item) {
+            this.selectedId = item.id;
+            this.selectedName = item.name;
+            this.open = false;
+            this.search = '';
+        }
+    }));
+});
+</script>
+@endpush
