@@ -1,13 +1,510 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Custom animations untuk UI yang lebih hidup */
+@layer base {
+    body {
+        @apply font-sans text-neutral-700 bg-gradient-girly min-h-screen;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        @apply font-heading font-semibold;
+    }
+}
+
+@layer components {
+
+    /* ✨ Girly Button Styles */
+    .btn-primary {
+        @apply inline-flex items-center justify-center gap-2 bg-gradient-primary text-white font-semibold py-3 px-6 rounded-2xl shadow-soft transition-all duration-300;
+    }
+
+    .btn-primary:hover {
+        @apply shadow-soft-lg;
+        transform: scale(1.02);
+    }
+
+    .btn-primary:active {
+        transform: scale(0.98);
+    }
+
+    .btn-primary:focus {
+        @apply outline-none ring-4 ring-primary-200;
+    }
+
+    .btn-secondary {
+        @apply inline-flex items-center justify-center gap-2 bg-white text-neutral-700 font-semibold py-3 px-6 rounded-2xl border-2 border-primary-100 shadow-card transition-all duration-300;
+    }
+
+    .btn-secondary:hover {
+        @apply border-primary-300 shadow-soft bg-primary-50;
+    }
+
+    .btn-ghost {
+        @apply inline-flex items-center justify-center gap-2 text-primary-500 font-semibold py-3 px-6 rounded-2xl transition-all duration-300;
+    }
+
+    .btn-ghost:hover {
+        @apply bg-primary-50;
+    }
+
+    .btn-danger {
+        @apply inline-flex items-center justify-center gap-2 bg-gradient-to-r from-red-400 to-red-500 text-white font-semibold py-3 px-6 rounded-2xl shadow-sm transition-all duration-300;
+    }
+
+    .btn-danger:hover {
+        @apply shadow-md;
+        transform: scale(1.02);
+    }
+
+    .btn-danger:active {
+        transform: scale(0.98);
+    }
+
+    .btn-success {
+        @apply inline-flex items-center justify-center gap-2 bg-gradient-to-r from-secondary-400 to-secondary-500 text-white font-semibold py-3 px-6 rounded-2xl shadow-sm transition-all duration-300;
+    }
+
+    .btn-success:hover {
+        @apply shadow-md;
+        transform: scale(1.02);
+    }
+
+    .btn-success:active {
+        transform: scale(0.98);
+    }
+
+    .btn-accent {
+        @apply inline-flex items-center justify-center gap-2 bg-gradient-to-r from-accent-400 to-accent-500 text-white font-semibold py-3 px-6 rounded-2xl shadow-dreamy transition-all duration-300;
+    }
+
+    .btn-accent:hover {
+        @apply shadow-lg;
+        transform: scale(1.02);
+    }
+
+    .btn-accent:active {
+        transform: scale(0.98);
+    }
+
+    .btn-sm {
+        @apply py-2 px-4 text-sm rounded-xl;
+    }
+
+    .btn-lg {
+        @apply py-4 px-8 text-base rounded-3xl;
+    }
+
+    /* 💖 Girly Card Styles */
+    .card {
+        @apply bg-white/80 backdrop-blur-sm rounded-3xl shadow-card border border-white/60 transition-all duration-300 overflow-hidden;
+    }
+
+    .card:hover {
+        @apply shadow-card-hover;
+    }
+
+    .card-cute {
+        @apply bg-white/90 backdrop-blur-sm rounded-3xl shadow-card border-2 border-primary-100/50 transition-all duration-300 overflow-hidden;
+    }
+
+    .card-cute:hover {
+        @apply shadow-soft border-primary-200/70;
+    }
+
+    .card-gradient {
+        @apply bg-gradient-to-br from-white via-primary-50/30 to-accent-50/30 rounded-3xl shadow-card border border-white/60 transition-all duration-300;
+    }
+
+    .card-padding {
+        @apply p-6;
+    }
+
+    .card-padding-sm {
+        @apply p-4;
+    }
+
+    .card-padding-lg {
+        @apply p-8;
+    }
+
+    /* 🌸 Girly Input Styles */
+    .input-field {
+        @apply w-full px-4 py-3 rounded-2xl border-2 border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-800 placeholder-neutral-400 transition-all duration-300 font-medium;
+    }
+
+    .input-field:hover {
+        @apply border-primary-200 bg-white;
+    }
+
+    .input-field:focus {
+        @apply border-primary-400 ring-4 ring-primary-100 outline-none bg-white;
+    }
+
+    .input-label {
+        @apply block text-sm font-semibold text-neutral-600 mb-2;
+    }
+
+    .input-helper {
+        @apply text-xs text-neutral-500 mt-2;
+    }
+
+    .input-error {
+        @apply border-red-300 bg-red-50/50;
+    }
+
+    .input-error:focus {
+        @apply border-red-400 ring-red-100;
+    }
+
+    .error-message {
+        @apply text-xs text-red-500 mt-2 font-semibold;
+    }
+
+    /* Form Label */
+    .form-label {
+        @apply block text-sm font-semibold text-neutral-600 mb-2;
+    }
+
+    .form-helper {
+        @apply text-xs text-neutral-500 mt-2;
+    }
+
+    /* 🏷️ Girly Badge Styles */
+    .badge {
+        @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wide;
+    }
+
+    .badge-success {
+        @apply bg-gradient-to-r from-secondary-100 to-secondary-50 text-secondary-700 border border-secondary-200;
+    }
+
+    .badge-warning {
+        @apply bg-gradient-to-r from-warm-100 to-warm-50 text-warm-700 border border-warm-200;
+    }
+
+    .badge-danger {
+        @apply bg-gradient-to-r from-red-100 to-red-50 text-red-600 border border-red-200;
+    }
+
+    .badge-info {
+        @apply bg-gradient-to-r from-blue-100 to-blue-50 text-blue-600 border border-blue-200;
+    }
+
+    .badge-neutral {
+        @apply bg-gradient-to-r from-neutral-100 to-neutral-50 text-neutral-600 border border-neutral-200;
+    }
+
+    .badge-primary {
+        @apply bg-gradient-to-r from-primary-100 to-primary-50 text-primary-600 border border-primary-200;
+    }
+
+    .badge-accent {
+        @apply bg-gradient-to-r from-accent-100 to-accent-50 text-accent-600 border border-accent-200;
+    }
+
+    /* 📊 Girly Table Styles */
+    .table-premium {
+        @apply w-full;
+    }
+
+    .table-premium thead {
+        @apply bg-gradient-to-r from-primary-50/50 to-accent-50/50 border-b-2 border-primary-100;
+    }
+
+    .table-premium th {
+        @apply px-5 py-4 text-left text-xs font-bold text-primary-600 uppercase tracking-wider;
+    }
+
+    .table-premium td {
+        @apply px-5 py-4 text-sm text-neutral-700 border-b border-primary-50;
+    }
+
+    .table-premium tbody tr {
+        @apply transition-all duration-200;
+    }
+
+    .table-premium tbody tr:hover {
+        @apply bg-gradient-to-r from-primary-50/30 to-accent-50/30;
+    }
+
+    .table-premium tbody tr:last-child td {
+        @apply border-b-0;
+    }
+
+    /* Legacy table-cute */
+    .table-cute {
+        @apply w-full;
+    }
+
+    .table-cute thead {
+        @apply bg-gradient-to-r from-primary-50/50 to-accent-50/50 border-b-2 border-primary-100;
+    }
+
+    .table-cute th {
+        @apply px-5 py-4 text-left text-xs font-bold text-primary-600 uppercase tracking-wider;
+    }
+
+    .table-cute td {
+        @apply px-5 py-4 text-sm text-neutral-700 border-b border-primary-50;
+    }
+
+    .table-cute tbody tr {
+        @apply transition-all duration-200;
+    }
+
+    .table-cute tbody tr:hover {
+        @apply bg-gradient-to-r from-primary-50/30 to-accent-50/30;
+    }
+
+    .table-cute tbody tr:last-child td {
+        @apply border-b-0;
+    }
+
+    /* 📱 Sidebar Styles */
+    .sidebar-link {
+        @apply flex items-center gap-3 px-4 py-3 rounded-2xl text-neutral-600 font-semibold text-sm transition-all duration-300;
+    }
+
+    .sidebar-link:hover {
+        @apply bg-gradient-to-r from-primary-50 to-accent-50/50 text-primary-600;
+        transform: translateX(4px);
+    }
+
+    .sidebar-link.active {
+        @apply bg-gradient-primary text-white shadow-soft;
+    }
+
+    .sidebar-link.active:hover {
+        transform: translateX(0);
+    }
+
+    /* 📄 Page Header */
+    .page-header {
+        @apply mb-8;
+    }
+
+    .page-title {
+        @apply text-2xl font-bold text-neutral-800 font-heading;
+    }
+
+    .page-subtitle {
+        @apply text-neutral-500 mt-1 font-medium;
+    }
+
+    /* 💫 Decorative Elements */
+    .decorative-blob {
+        @apply absolute rounded-full opacity-30 pointer-events-none;
+        filter: blur(60px);
+    }
+
+    .decorative-dots {
+        background-image: radial-gradient(circle, theme('colors.primary.200') 1.5px, transparent 1.5px);
+        background-size: 24px 24px;
+    }
+
+    /* 🌈 Status Colors */
+    .status-online {
+        @apply bg-secondary-400;
+        box-shadow: 0 0 8px theme('colors.secondary.400');
+    }
+
+    .status-offline {
+        @apply bg-warm-400;
+        box-shadow: 0 0 8px theme('colors.warm.400');
+    }
+
+    /* 💝 Special Components */
+    .stat-card {
+        @apply card p-5 flex items-center gap-4 transition-transform duration-300;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+    }
+
+    .stat-icon {
+        @apply w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner-glow;
+    }
+
+    .stat-value {
+        @apply text-2xl font-bold text-neutral-800 font-heading;
+    }
+
+    .stat-label {
+        @apply text-sm text-neutral-500 font-medium;
+    }
+
+    /* 🎀 Icon Wrapper */
+    .icon-wrap {
+        @apply w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300;
+    }
+
+    .icon-wrap-primary {
+        @apply bg-gradient-primary text-white shadow-soft;
+    }
+
+    .icon-wrap-secondary {
+        @apply bg-gradient-to-br from-secondary-400 to-secondary-500 text-white;
+    }
+
+    .icon-wrap-accent {
+        @apply bg-gradient-to-br from-accent-400 to-accent-500 text-white shadow-dreamy;
+    }
+
+    /* Empty State */
+    .empty-state {
+        @apply text-center py-16 px-8;
+    }
+
+    .empty-state-icon {
+        @apply w-24 h-24 mx-auto mb-6 text-primary-200;
+    }
+
+    .empty-state-title {
+        @apply text-xl font-bold text-neutral-600 font-heading mb-2;
+    }
+
+    .empty-state-text {
+        @apply text-neutral-500 mb-6;
+    }
+}
+
+/* 🎨 Custom Scrollbar - Girly Style */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: theme('colors.primary.50');
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, theme('colors.primary.300'), theme('colors.primary.400'));
+    border-radius: 10px;
+    border: 2px solid theme('colors.primary.50');
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, theme('colors.primary.400'), theme('colors.primary.500'));
+}
+
+/* Global styles */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Selection color - girly pink */
+::selection {
+    background: theme('colors.primary.200');
+    color: theme('colors.primary.800');
+}
+
+::-moz-selection {
+    background: theme('colors.primary.200');
+    color: theme('colors.primary.800');
+}
+
+/* Smooth transitions */
+button, a, input, select, textarea {
+    transition: all 0.3s ease;
+}
+
+/* Focus states */
+button:focus, a:focus, input:focus, select:focus, textarea:focus {
+    outline: none;
+}
+
+/* Loading spinner - girly style */
+.loading-spinner {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    border: 3px solid theme('colors.primary.100');
+    border-top-color: theme('colors.primary.500');
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Checkbox & Radio - Girly Style */
+input[type="checkbox"], input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    border-radius: 8px;
+    border: 2px solid theme('colors.primary.200');
+    transition: all 0.2s ease;
+}
+
+input[type="checkbox"]:focus, input[type="radio"]:focus {
+    box-shadow: 0 0 0 4px theme('colors.primary.100');
+}
+
+/* Select Dropdown */
+select.input-field {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23FF6B8A' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Floating Labels Animation */
+.float-label {
+    position: relative;
+}
+
+.float-label input:focus~label,
+.float-label input:not(:placeholder-shown)~label {
+    transform: translateY(-24px) scale(0.9);
+    color: theme('colors.primary.500');
+}
+
+/* Pulse animation for notifications */
+@keyframes ping-soft {
+    75%, 100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+.animate-ping-soft {
+    animation: ping-soft 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Gradient text */
+.text-gradient {
+    background: linear-gradient(135deg, theme('colors.primary.400'), theme('colors.primary.600'));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Glass morphism effect */
+.glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Float animation */
 @keyframes float {
     0%, 100% {
-        transform: translateY(0px);
+        transform: translateY(0);
     }
 
     50% {
@@ -15,278 +512,6 @@
     }
 }
 
-@keyframes pulse-soft {
-    0%, 100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.7;
-    }
-}
-
-@keyframes wiggle {
-    0%, 100% {
-        transform: rotate(-3deg);
-    }
-
-    50% {
-        transform: rotate(3deg);
-    }
-}
-
-/* Custom utilities untuk Posting Cinta */
-@layer components {
-    .btn-primary {
-        @apply bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 text-white font-bold py-3.5 px-7 rounded-2xl shadow-xl transition-all transform;
-    }
-
-    .btn-primary:hover {
-        @apply shadow-2xl scale-105;
-    }
-
-    .btn-primary:active {
-        @apply scale-95;
-    }
-
-    .btn-secondary {
-        @apply bg-white text-gray-700 font-semibold py-3.5 px-7 rounded-2xl shadow-lg transition-all;
-        border-width: 3px;
-        border-color: rgb(251 207 232);
-    }
-
-    .btn-secondary:hover {
-        @apply bg-pink-50 shadow-xl;
-        border-color: rgb(249 168 212);
-    }
-
-    .btn-secondary:active {
-        @apply scale-95;
-    }
-
-    .btn-success {
-        @apply bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold py-3.5 px-7 rounded-2xl shadow-xl transition-all transform;
-    }
-
-    .btn-success:hover {
-        @apply shadow-2xl scale-105;
-    }
-
-    .btn-success:active {
-        @apply scale-95;
-    }
-
-    .btn-danger {
-        @apply bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold py-3.5 px-7 rounded-2xl shadow-xl transition-all transform;
-    }
-
-    .btn-danger:hover {
-        @apply shadow-2xl scale-105;
-    }
-
-    .btn-danger:active {
-        @apply scale-95;
-    }
-
-    .card {
-        @apply bg-white rounded-3xl shadow-xl transition-all;
-        border-width: 4px;
-        border-color: rgb(252 231 243);
-    }
-
-    .card:hover {
-        @apply shadow-2xl;
-    }
-
-    .card-cute {
-        @apply bg-gradient-to-br from-pink-50 to-purple-50 rounded-3xl shadow-lg transition-all;
-        border-width: 3px;
-        border-color: rgb(251 207 232);
-    }
-
-    .card-cute:hover {
-        @apply shadow-xl;
-        transform: scale(1.02);
-    }
-
-    .input-field {
-        @apply w-full px-5 py-4 rounded-2xl transition-all text-base bg-white text-gray-700;
-        border-width: 3px;
-        border-color: rgb(251 207 232);
-    }
-
-    .input-field::placeholder {
-        @apply text-gray-400;
-    }
-
-    .input-field:focus {
-        @apply shadow-lg outline-none;
-        border-color: rgb(244 114 182);
-        ring-width: 4px;
-        ring-color: rgb(252 231 243);
-    }
-
-    .badge {
-        @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shadow-sm;
-    }
-
-    .badge-success {
-        @apply bg-green-100 text-green-700;
-        border-width: 2px;
-        border-color: rgb(134 239 172);
-    }
-
-    .badge-warning {
-        @apply bg-amber-100 text-amber-700;
-        border-width: 2px;
-        border-color: rgb(252 211 77);
-    }
-
-    .badge-danger {
-        @apply bg-red-100 text-red-700;
-        border-width: 2px;
-        border-color: rgb(252 165 165);
-    }
-
-    .badge-info {
-        @apply bg-blue-100 text-blue-700;
-        border-width: 2px;
-        border-color: rgb(147 197 253);
-    }
-
-    /* Cute floating elements */
-    .float-animation {
-        animation: float 3s ease-in-out infinite;
-    }
-
-    .pulse-soft-animation {
-        animation: pulse-soft 2s ease-in-out infinite;
-    }
-
-    .wiggle-animation {
-        animation: wiggle 1s ease-in-out infinite;
-    }
-
-    /* Custom scrollbar yang cute */
-    .cute-scrollbar::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
-
-    .cute-scrollbar::-webkit-scrollbar-track {
-        @apply bg-pink-100 rounded-full;
-    }
-
-    .cute-scrollbar::-webkit-scrollbar-thumb {
-        @apply bg-gradient-to-b from-pink-400 to-purple-400 rounded-full;
-    }
-
-    .cute-scrollbar::-webkit-scrollbar-thumb:hover {
-        @apply bg-gradient-to-b from-pink-500 to-purple-500;
-    }
-
-    /* Form labels yang lebih jelas */
-    .form-label {
-        @apply block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2;
-    }
-
-    .form-helper {
-        @apply text-xs text-gray-500 mt-1.5 flex items-start gap-1;
-    }
-
-    /* Error states */
-    .input-error {
-        border-color: rgb(248 113 113);
-        ring-width: 4px;
-        ring-color: rgb(254 226 226);
-    }
-
-    .error-message {
-        @apply text-xs text-red-600 mt-1.5 flex items-start gap-1 font-semibold;
-    }
-
-    /* Table styles */
-    .table-cute {
-        @apply w-full border-collapse;
-    }
-
-    .table-cute thead {
-        @apply bg-gradient-to-r from-pink-100 to-purple-100;
-    }
-
-    .table-cute th {
-        @apply px-6 py-4 text-left text-sm font-bold text-gray-800;
-        border-bottom-width: 4px;
-        border-color: rgb(251 207 232);
-    }
-
-    .table-cute td {
-        @apply px-6 py-4 text-sm text-gray-700;
-        border-bottom-width: 2px;
-        border-color: rgb(252 231 243);
-    }
-
-    .table-cute tbody tr {
-        @apply transition-colors;
-    }
-
-    .table-cute tbody tr:hover {
-        @apply bg-pink-50;
-    }
-}
-
-/* Utility untuk scale yang lebih smooth */
-@layer utilities {
-    .scale-102 {
-        transform: scale(1.02);
-    }
-
-    .border-3 {
-        border-width: 3px;
-    }
-
-    .border-4 {
-        border-width: 4px;
-    }
-}
-
-/* Override default Tailwind untuk lebih girly */
-* {
-    @apply antialiased;
-}
-
-body {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-/* Selection color yang cute */
-::selection {
-    @apply bg-pink-300 text-white;
-}
-
-::-moz-selection {
-    @apply bg-pink-300 text-white;
-}
-
-/* Smooth transitions untuk semua interaksi */
-button, a, input, select, textarea {
-    @apply transition-all duration-200;
-}
-
-/* Focus states yang lebih jelas untuk accessibility */
-button:focus, a:focus, input:focus, select:focus, textarea:focus {
-    @apply outline-none;
-}
-
-/* Loading states */
-.loading-spinner {
-    @apply inline-block w-6 h-6 rounded-full animate-spin;
-    border-width: 3px;
-    border-color: rgb(251 207 232);
-    border-top-color: rgb(219 39 119);
-}
-
-/* Tooltip cute */
-.tooltip {
-    @apply absolute z-50 px-3 py-2 text-xs font-semibold text-white bg-gray-800 rounded-xl shadow-xl;
+.animate-float {
+    animation: float 6s ease-in-out infinite;
 }

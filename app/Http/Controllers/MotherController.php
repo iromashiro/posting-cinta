@@ -52,7 +52,7 @@ class MotherController extends Controller
             ->withCount('children')
             ->with('posyandu')
             ->orderBy('name')
-            ->simplePaginate(15)
+            ->paginate(15)
             ->appends($request->query());
 
         $posyandus = Posyandu::query()

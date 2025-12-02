@@ -19,7 +19,7 @@ class GrowthStandardController extends Controller
             ->orderBy('indicator')
             ->orderBy('gender')
             ->orderByRaw('COALESCE(age_months, 100000), COALESCE(length_height_cm, 100000)')
-            ->simplePaginate(25)
+            ->paginate(25)
             ->appends($request->query());
 
         $indicators = ['wfa' => 'BB/U', 'hfa' => 'TB/U', 'wfh' => 'BB/TB'];

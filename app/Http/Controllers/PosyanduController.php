@@ -40,7 +40,7 @@ class PosyanduController extends Controller
             ->when($puskesmasId && $accessiblePuskesmasId === null, fn($qBuilder) => $qBuilder->where('puskesmas_id', $puskesmasId))
             ->with(['puskesmas', 'kader'])
             ->orderBy('name')
-            ->simplePaginate(15)
+            ->paginate(15)
             ->appends($request->query());
 
         // Only show puskesmas filter for admin

@@ -1,82 +1,133 @@
 @extends('layouts.app')
 
 @section('content')
-@php($header = 'Tambah Posyandu')
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="page-title">Tambah Posyandu</h1>
+    <p class="page-subtitle">Daftarkan posyandu baru ke dalam sistem</p>
+</div>
 
-<form method="post" action="{{ route('posyandu.store') }}" class="space-y-4">
-    @csrf
+<div class="card card-padding">
+    <form method="post" action="{{ route('posyandu.store') }}" class="space-y-6">
+        @csrf
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-            <label class="block text-sm mb-1">Puskesmas <span class="text-rose-600">*</span></label>
-            <select name="puskesmas_id"
-                class="w-full rounded border-slate-300 focus:border-brand-400 focus:ring-brand-400">
-                <option value="">Pilih Puskesmas</option>
-                @foreach ($puskesmas as $p)
-                <option value="{{ $p->id }}" @selected(old('puskesmas_id')==$p->id)>{{ $p->name }}</option>
-                @endforeach
-            </select>
-            @error('puskesmas_id') <div class="text-xs text-rose-600 mt-1">{{ $message }}</div> @enderror
+        <!-- Info Helper -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div class="flex-1 text-sm text-blue-800">
+                    <strong>Tips:</strong> Pastikan data yang dimasukkan sudah benar. Data bertanda <span
+                        class="text-red-600 font-bold">*</span> wajib diisi.
+                </div>
+            </div>
         </div>
 
-        <div>
-            <label class="block text-sm mb-1">Nama Posyandu <span class="text-rose-600">*</span></label>
-            <input type="text" name="name" value="{{ old('name') }}"
-                class="w-full rounded border-slate-300 focus:border-brand-400 focus:ring-brand-400">
-            @error('name') <div class="text-xs text-rose-600 mt-1">{{ $message }}</div> @enderror
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Puskesmas -->
+            <div>
+                <label class="input-label">
+                    Puskesmas <span class="text-red-500">*</span>
+                </label>
+                <select name="puskesmas_id" class="input-field @error('puskesmas_id') input-error @enderror">
+                    <option value="">Pilih Puskesmas</option>
+                    @foreach ($puskesmas as $p)
+                    <option value="{{ $p->id }}" @selected(old('puskesmas_id')==$p->id)>{{ $p->name }}</option>
+                    @endforeach
+                </select>
+                <p class="input-helper">Puskesmas yang membawahi posyandu ini</p>
+                @error('puskesmas_id') <p class="error-message">{{ $message }}</p> @enderror
+            </div>
+
+            <!-- Nama Posyandu -->
+            <div>
+                <label class="input-label">
+                    Nama Posyandu <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="name" value="{{ old('name') }}" placeholder="Masukkan nama posyandu"
+                    class="input-field @error('name') input-error @enderror">
+                <p class="input-helper">Nama lengkap posyandu</p>
+                @error('name') <p class="error-message">{{ $message }}</p> @enderror
+            </div>
+
+            <!-- Desa/Kelurahan -->
+            <div>
+                <label class="input-label">Desa/Kelurahan</label>
+                <input type="text" name="village" value="{{ old('village') }}" placeholder="Nama desa atau kelurahan"
+                    class="input-field @error('village') input-error @enderror">
+                <p class="input-helper">Desa/kelurahan lokasi posyandu</p>
+                @error('village') <p class="error-message">{{ $message }}</p> @enderror
+            </div>
+
+            <!-- Kecamatan -->
+            <div>
+                <label class="input-label">Kecamatan</label>
+                <input type="text" name="district" value="{{ old('district') }}" placeholder="Nama kecamatan"
+                    class="input-field @error('district') input-error @enderror">
+                <p class="input-helper">Kecamatan lokasi posyandu</p>
+                @error('district') <p class="error-message">{{ $message }}</p> @enderror
+            </div>
+
+            <!-- Alamat -->
+            <div class="md:col-span-2">
+                <label class="input-label">Alamat Lengkap</label>
+                <textarea name="address" rows="3" placeholder="Alamat lengkap posyandu"
+                    class="input-field @error('address') input-error @enderror">{{ old('address') }}</textarea>
+                <p class="input-helper">Alamat detail untuk memudahkan pencarian lokasi</p>
+                @error('address') <p class="error-message">{{ $message }}</p> @enderror
+            </div>
+
+            <!-- Telepon -->
+            <div>
+                <label class="input-label">Telepon</label>
+                <input type="text" name="phone" value="{{ old('phone') }}" placeholder="Nomor telepon"
+                    class="input-field @error('phone') input-error @enderror">
+                <p class="input-helper">Nomor telepon yang dapat dihubungi</p>
+                @error('phone') <p class="error-message">{{ $message }}</p> @enderror
+            </div>
+
+            <!-- Kader PJ -->
+            <div>
+                <label class="input-label">Kader Penanggung Jawab</label>
+                <select name="kader_id" class="input-field @error('kader_id') input-error @enderror">
+                    <option value="">Pilih Kader</option>
+                    @foreach ($kaders as $k)
+                    <option value="{{ $k->id }}" @selected(old('kader_id')==$k->id)>{{ $k->name }}</option>
+                    @endforeach
+                </select>
+                <p class="input-helper">Kader yang bertanggung jawab atas posyandu ini</p>
+                @error('kader_id') <p class="error-message">{{ $message }}</p> @enderror
+            </div>
+
+            <!-- Status Aktif -->
+            <div class="md:col-span-2">
+                <label class="input-label">Status</label>
+                <div class="flex items-center gap-3 mt-2">
+                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="is_active" value="1" id="is_active" @checked(old('is_active',
+                            true)) class="w-4 h-4 text-primary-500 border-neutral-300 rounded focus:ring-primary-400">
+                        <span class="text-sm font-medium text-neutral-700">Posyandu Aktif</span>
+                    </label>
+                </div>
+                <p class="input-helper">Centang jika posyandu sedang beroperasi aktif</p>
+                @error('is_active') <p class="error-message">{{ $message }}</p> @enderror
+            </div>
         </div>
 
-        <div>
-            <label class="block text-sm mb-1">Desa/Kelurahan</label>
-            <input type="text" name="village" value="{{ old('village') }}"
-                class="w-full rounded border-slate-300 focus:border-brand-400 focus:ring-brand-400">
-            @error('village') <div class="text-xs text-rose-600 mt-1">{{ $message }}</div> @enderror
+        <!-- Action Buttons -->
+        <div class="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-neutral-200">
+            <a href="{{ route('posyandu.index') }}" class="btn-secondary">Batal</a>
+            <button type="submit" class="btn-primary">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Simpan Data
+            </button>
         </div>
+    </form>
+</div>
 
-        <div>
-            <label class="block text-sm mb-1">Kecamatan</label>
-            <input type="text" name="district" value="{{ old('district') }}"
-                class="w-full rounded border-slate-300 focus:border-brand-400 focus:ring-brand-400">
-            @error('district') <div class="text-xs text-rose-600 mt-1">{{ $message }}</div> @enderror
-        </div>
-
-        <div class="md:col-span-2">
-            <label class="block text-sm mb-1">Alamat</label>
-            <textarea name="address" rows="3"
-                class="w-full rounded border-slate-300 focus:border-brand-400 focus:ring-brand-400">{{ old('address') }}</textarea>
-            @error('address') <div class="text-xs text-rose-600 mt-1">{{ $message }}</div> @enderror
-        </div>
-
-        <div>
-            <label class="block text-sm mb-1">Telepon</label>
-            <input type="text" name="phone" value="{{ old('phone') }}"
-                class="w-full rounded border-slate-300 focus:border-brand-400 focus:ring-brand-400">
-            @error('phone') <div class="text-xs text-rose-600 mt-1">{{ $message }}</div> @enderror
-        </div>
-
-        <div>
-            <label class="block text-sm mb-1">Kader Penanggung Jawab</label>
-            <select name="kader_id" class="w-full rounded border-slate-300 focus:border-brand-400 focus:ring-brand-400">
-                <option value="">-</option>
-                @foreach ($kaders as $k)
-                <option value="{{ $k->id }}" @selected(old('kader_id')==$k->id)>{{ $k->name }}</option>
-                @endforeach
-            </select>
-            @error('kader_id') <div class="text-xs text-rose-600 mt-1">{{ $message }}</div> @enderror
-        </div>
-
-        <div class="flex items-center gap-2">
-            <input type="checkbox" name="is_active" value="1" id="is_active" @checked(old('is_active', true))
-                class="rounded border-slate-300">
-            <label for="is_active" class="text-sm">Aktif</label>
-            @error('is_active') <div class="text-xs text-rose-600 mt-1">{{ $message }}</div> @enderror
-        </div>
-    </div>
-
-    <div class="pt-4 flex items-center gap-2">
-        <a href="{{ route('posyandu.index') }}"
-            class="px-3 py-2 rounded border border-slate-300 hover:bg-slate-50">Batal</a>
-        <button class="px-3 py-2 rounded bg-brand-500 text-white hover:bg-brand-600">Simpan</button>
-    </div>
-</form>
 @endsection

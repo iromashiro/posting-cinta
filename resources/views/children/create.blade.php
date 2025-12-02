@@ -1,28 +1,27 @@
 @extends('layouts.app')
 
 @section('content')
-@php
-$header = '➕ Tambah Anak Baru';
-@endphp
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="page-title">Tambah Data Anak</h1>
+    <p class="page-subtitle">Daftarkan anak baru untuk pemantauan pertumbuhan</p>
+</div>
 
-<div class="card-cute">
-    <!-- Header dengan ilustrasi -->
-    <div class="mb-6 text-center">
-        <div class="text-5xl mb-3">👶✨</div>
-        <h2 class="text-xl font-semibold text-slate-800 mb-1">Tambah Data Anak</h2>
-        <p class="text-sm text-slate-600">Daftarkan anak baru untuk pemantauan pertumbuhan</p>
-    </div>
-
+<div class="card card-padding">
     <form method="post" action="{{ route('children.store') }}" class="space-y-6">
         @csrf
 
         <!-- Info Helper -->
-        <div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div class="flex items-start gap-3">
-                <div class="text-2xl">💡</div>
+                <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
                 <div class="flex-1 text-sm text-blue-800">
                     <strong>Tips:</strong> Pastikan data yang dimasukkan sudah benar. Data bertanda <span
-                        class="text-rose-600 font-bold">*</span> wajib diisi.
+                        class="text-red-600 font-bold">*</span> wajib diisi.
                 </div>
             </div>
         </div>
@@ -31,43 +30,40 @@ $header = '➕ Tambah Anak Baru';
             <!-- Posyandu - Searchable -->
             <div x-data="searchableSelect({
                 items: {{ Js::from($posyandus->map(fn($p) => ['id' => $p->id, 'name' => $p->name])) }},
-                selected: {{ old('posyandu_id') ?? 'null' }},
+                selected: {{ old('posyandu_id', $prefill['posyandu_id'] ?? 'null') ?: 'null' }},
                 inputName: 'posyandu_id',
                 placeholder: 'Cari posyandu...',
                 limitBeforeSearch: 10
             })">
-                <label class="form-label">
-                    <span class="flex items-center gap-2">
-                        <span>🏥</span>
-                        <span>Posyandu <span class="text-rose-600">*</span></span>
-                    </span>
+                <label class="input-label">
+                    Posyandu <span class="text-red-500">*</span>
                 </label>
                 <div class="relative">
                     <input type="hidden" :name="inputName" :value="selectedId">
                     <button type="button" @click="open = !open"
                         class="input-field text-left flex items-center justify-between @error('posyandu_id') input-error @enderror">
                         <span x-text="selectedName || 'Pilih Posyandu'"
-                            :class="!selectedName && 'text-slate-400'"></span>
-                        <svg class="w-5 h-5 text-slate-400 transition-transform" :class="open && 'rotate-180'"
+                            :class="!selectedName && 'text-neutral-400'"></span>
+                        <svg class="w-5 h-5 text-neutral-400 transition-transform" :class="open && 'rotate-180'"
                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                         </svg>
                     </button>
 
                     <div x-show="open" @click.away="open = false" x-transition
-                        class="absolute z-50 w-full mt-1 bg-white border-2 border-slate-200 rounded-xl shadow-lg max-h-60 overflow-hidden">
-                        <div class="p-2 border-b border-slate-100">
+                        class="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg max-h-60 overflow-hidden">
+                        <div class="p-2 border-b border-neutral-100">
                             <input type="text" x-model="search" x-ref="searchInput" @keydown.escape="open = false"
                                 placeholder="Ketik untuk mencari..."
-                                class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400">
                         </div>
                         <ul class="max-h-48 overflow-y-auto">
                             <template x-for="item in displayItems" :key="item.id">
                                 <li @click="selectItem(item)"
-                                    class="px-4 py-2 cursor-pointer hover:bg-brand-50 flex items-center gap-2"
-                                    :class="selectedId == item.id && 'bg-brand-100 text-brand-700'">
+                                    class="px-4 py-2 cursor-pointer hover:bg-primary-50 flex items-center gap-2"
+                                    :class="selectedId == item.id && 'bg-primary-100 text-primary-700'">
                                     <span x-text="item.name"></span>
-                                    <svg x-show="selectedId == item.id" class="w-4 h-4 text-brand-600 ml-auto"
+                                    <svg x-show="selectedId == item.id" class="w-4 h-4 text-primary-600 ml-auto"
                                         fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd"
                                             d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -75,59 +71,57 @@ $header = '➕ Tambah Anak Baru';
                                     </svg>
                                 </li>
                             </template>
-                            <li x-show="displayItems.length === 0" class="px-4 py-3 text-sm text-slate-500 text-center">
+                            <li x-show="displayItems.length === 0"
+                                class="px-4 py-3 text-sm text-neutral-500 text-center">
                                 Tidak ada hasil ditemukan
                             </li>
                             <li x-show="!search && items.length > limitBeforeSearch"
-                                class="px-4 py-2 text-xs text-slate-400 text-center bg-slate-50 border-t">
+                                class="px-4 py-2 text-xs text-neutral-400 text-center bg-neutral-50 border-t">
                                 <span x-text="'Ketik untuk mencari dari ' + items.length + ' data'"></span>
                             </li>
                         </ul>
                     </div>
                 </div>
-                <p class="form-helper">Posyandu tempat anak akan didaftarkan</p>
-                @error('posyandu_id') <div class="error-message">{{ $message }}</div> @enderror
+                <p class="input-helper">Posyandu tempat anak akan didaftarkan</p>
+                @error('posyandu_id') <p class="error-message">{{ $message }}</p> @enderror
             </div>
 
-            <!-- Ibu - Searchable (Limited to 5 before search) -->
+            <!-- Ibu - Searchable -->
             <div x-data="searchableSelect({
                 items: {{ Js::from($mothers->map(fn($m) => ['id' => $m->id, 'name' => $m->name, 'posyandu_id' => $m->posyandu_id])) }},
-                selected: {{ old('mother_id') ?? 'null' }},
+                selected: {{ old('mother_id', $prefill['mother_id'] ?? 'null') ?: 'null' }},
                 inputName: 'mother_id',
                 placeholder: 'Cari ibu...',
                 limitBeforeSearch: 5
             })">
-                <label class="form-label">
-                    <span class="flex items-center gap-2">
-                        <span>👩</span>
-                        <span>Nama Ibu <span class="text-rose-600">*</span></span>
-                    </span>
+                <label class="input-label">
+                    Nama Ibu <span class="text-red-500">*</span>
                 </label>
                 <div class="relative">
                     <input type="hidden" :name="inputName" :value="selectedId">
                     <button type="button" @click="open = !open"
                         class="input-field text-left flex items-center justify-between @error('mother_id') input-error @enderror">
-                        <span x-text="selectedName || 'Pilih Ibu'" :class="!selectedName && 'text-slate-400'"></span>
-                        <svg class="w-5 h-5 text-slate-400 transition-transform" :class="open && 'rotate-180'"
+                        <span x-text="selectedName || 'Pilih Ibu'" :class="!selectedName && 'text-neutral-400'"></span>
+                        <svg class="w-5 h-5 text-neutral-400 transition-transform" :class="open && 'rotate-180'"
                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                         </svg>
                     </button>
 
                     <div x-show="open" @click.away="open = false" x-transition
-                        class="absolute z-50 w-full mt-1 bg-white border-2 border-slate-200 rounded-xl shadow-lg max-h-60 overflow-hidden">
-                        <div class="p-2 border-b border-slate-100">
+                        class="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg max-h-60 overflow-hidden">
+                        <div class="p-2 border-b border-neutral-100">
                             <input type="text" x-model="search" x-ref="searchInput" @keydown.escape="open = false"
                                 placeholder="Ketik nama ibu untuk mencari..."
-                                class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400">
                         </div>
                         <ul class="max-h-48 overflow-y-auto">
                             <template x-for="item in displayItems" :key="item.id">
                                 <li @click="selectItem(item)"
-                                    class="px-4 py-2 cursor-pointer hover:bg-brand-50 flex items-center gap-2"
-                                    :class="selectedId == item.id && 'bg-brand-100 text-brand-700'">
+                                    class="px-4 py-2 cursor-pointer hover:bg-primary-50 flex items-center gap-2"
+                                    :class="selectedId == item.id && 'bg-primary-100 text-primary-700'">
                                     <span x-text="item.name"></span>
-                                    <svg x-show="selectedId == item.id" class="w-4 h-4 text-brand-600 ml-auto"
+                                    <svg x-show="selectedId == item.id" class="w-4 h-4 text-primary-600 ml-auto"
                                         fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd"
                                             d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -136,96 +130,83 @@ $header = '➕ Tambah Anak Baru';
                                 </li>
                             </template>
                             <li x-show="displayItems.length === 0 && search"
-                                class="px-4 py-3 text-sm text-slate-500 text-center">
+                                class="px-4 py-3 text-sm text-neutral-500 text-center">
                                 Tidak ada hasil ditemukan
                             </li>
                             <li x-show="!search && items.length > limitBeforeSearch"
-                                class="px-4 py-2 text-xs text-slate-400 text-center bg-slate-50 border-t">
+                                class="px-4 py-2 text-xs text-neutral-400 text-center bg-neutral-50 border-t">
                                 <span x-text="'Ketik untuk mencari dari ' + items.length + ' data ibu'"></span>
                             </li>
                         </ul>
                     </div>
                 </div>
-                <p class="form-helper">Ibu dari anak yang akan didaftarkan</p>
-                @error('mother_id') <div class="error-message">{{ $message }}</div> @enderror
+                <p class="input-helper">Ibu dari anak yang akan didaftarkan</p>
+                @error('mother_id') <p class="error-message">{{ $message }}</p> @enderror
             </div>
 
             <!-- Nama Anak -->
             <div>
-                <label class="form-label">
-                    <span class="flex items-center gap-2">
-                        <span>👶</span>
-                        <span>Nama Anak <span class="text-rose-600">*</span></span>
-                    </span>
+                <label class="input-label">
+                    Nama Anak <span class="text-red-500">*</span>
                 </label>
                 <input type="text" name="name" value="{{ old('name') }}" placeholder="Masukkan nama lengkap anak"
                     class="input-field @error('name') input-error @enderror">
-                <p class="form-helper">Nama lengkap sesuai akta kelahiran</p>
-                @error('name') <div class="error-message">{{ $message }}</div> @enderror
+                <p class="input-helper">Nama lengkap sesuai akta kelahiran</p>
+                @error('name') <p class="error-message">{{ $message }}</p> @enderror
             </div>
 
             <!-- NIK -->
             <div>
-                <label class="form-label">
-                    <span class="flex items-center gap-2">
-                        <span>🆔</span>
-                        <span>NIK (Opsional)</span>
-                    </span>
-                </label>
+                <label class="input-label">NIK (Opsional)</label>
                 <input type="text" name="nik" value="{{ old('nik') }}" placeholder="Nomor Induk Kependudukan"
                     class="input-field @error('nik') input-error @enderror">
-                <p class="form-helper">16 digit NIK anak jika sudah ada</p>
-                @error('nik') <div class="error-message">{{ $message }}</div> @enderror
+                <p class="input-helper">16 digit NIK anak jika sudah ada</p>
+                @error('nik') <p class="error-message">{{ $message }}</p> @enderror
             </div>
 
             <!-- Jenis Kelamin -->
             <div>
-                <label class="form-label">
-                    <span class="flex items-center gap-2">
-                        <span>👧👦</span>
-                        <span>Jenis Kelamin <span class="text-rose-600">*</span></span>
-                    </span>
+                <label class="input-label">
+                    Jenis Kelamin <span class="text-red-500">*</span>
                 </label>
                 <div class="flex items-center gap-6 mt-2">
                     <label class="inline-flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="gender" value="male"
-                            class="w-4 h-4 text-brand-500 border-slate-300 focus:ring-brand-400"
+                            class="w-4 h-4 text-primary-500 border-neutral-300 focus:ring-primary-400"
                             {{ old('gender') === 'male' ? 'checked' : '' }}>
-                        <span class="text-sm font-medium text-slate-700">👦 Laki-laki</span>
+                        <span class="text-sm font-medium text-neutral-700">Laki-laki</span>
                     </label>
                     <label class="inline-flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="gender" value="female"
-                            class="w-4 h-4 text-brand-500 border-slate-300 focus:ring-brand-400"
+                            class="w-4 h-4 text-primary-500 border-neutral-300 focus:ring-primary-400"
                             {{ old('gender') === 'female' ? 'checked' : '' }}>
-                        <span class="text-sm font-medium text-slate-700">👧 Perempuan</span>
+                        <span class="text-sm font-medium text-neutral-700">Perempuan</span>
                     </label>
                 </div>
-                <p class="form-helper">Pilih jenis kelamin anak</p>
-                @error('gender') <div class="error-message">{{ $message }}</div> @enderror
+                <p class="input-helper">Pilih jenis kelamin anak</p>
+                @error('gender') <p class="error-message">{{ $message }}</p> @enderror
             </div>
 
             <!-- Tanggal Lahir -->
             <div>
-                <label class="form-label">
-                    <span class="flex items-center gap-2">
-                        <span>🎂</span>
-                        <span>Tanggal Lahir <span class="text-rose-600">*</span></span>
-                    </span>
+                <label class="input-label">
+                    Tanggal Lahir <span class="text-red-500">*</span>
                 </label>
                 <input type="date" name="date_of_birth" value="{{ old('date_of_birth') }}"
                     class="input-field @error('date_of_birth') input-error @enderror">
-                <p class="form-helper">Tanggal lahir sesuai akta kelahiran</p>
-                @error('date_of_birth') <div class="error-message">{{ $message }}</div> @enderror
+                <p class="input-helper">Tanggal lahir sesuai akta kelahiran</p>
+                @error('date_of_birth') <p class="error-message">{{ $message }}</p> @enderror
             </div>
         </div>
 
         <!-- Action Buttons -->
-        <div class="pt-4 flex items-center gap-3 border-t border-slate-200">
-            <a href="{{ route('children.index') }}" class="btn-secondary">
-                <span>← Batal</span>
-            </a>
+        <div class="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-neutral-200">
+            <a href="{{ route('children.index') }}" class="btn-secondary">Batal</a>
             <button type="submit" class="btn-primary">
-                <span>💾 Simpan Data Anak</span>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Simpan Data
             </button>
         </div>
     </form>

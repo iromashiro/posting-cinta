@@ -54,7 +54,7 @@ class ChildController extends Controller
             ->when($motherId, fn($qb) => $qb->where('mother_id', $motherId))
             ->with(['mother:id,name', 'posyandu:id,name'])
             ->orderBy('name')
-            ->simplePaginate(15)
+            ->paginate(15)
             ->appends($request->query());
 
         // Filter posyandu dan mother untuk dropdown

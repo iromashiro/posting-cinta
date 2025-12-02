@@ -5,246 +5,191 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="theme-color" content="#FF9ECD">
+    <meta name="theme-color" content="#D9536F">
     <title>Daftar - {{ config('app.name') }}</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
-    </style>
 </head>
 
-<body class="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 relative overflow-hidden">
-    <!-- Decorative floating elements -->
-    <div class="absolute top-10 right-10 text-6xl opacity-20 float-animation">🌟</div>
-    <div class="absolute top-40 left-20 text-5xl opacity-20 pulse-soft-animation">✨</div>
-    <div class="absolute bottom-20 right-20 text-5xl opacity-20 wiggle-animation">💕</div>
-    <div class="absolute bottom-40 left-10 text-6xl opacity-20 float-animation">🎉</div>
-
-    <div class="min-h-screen flex items-center justify-center px-4 py-12 relative z-10">
+<body class="min-h-screen bg-neutral-100">
+    <div class="min-h-screen flex items-center justify-center px-4 py-12">
         <div class="w-full max-w-md">
-            <!-- Logo & Header - Lebih cute -->
+            <!-- Logo & Header -->
             <div class="text-center mb-8">
-                <div
-                    class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-pink-400 via-purple-400 to-pink-500 rounded-3xl shadow-2xl mb-6 float-animation">
-                    <span class="text-5xl">💕</span>
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-primary-500 rounded-xl shadow-lg mb-5">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                        </path>
+                    </svg>
                 </div>
-                <h1 class="text-4xl font-bold text-gray-800 mb-3 flex items-center justify-center gap-2">
+                <h1 class="text-2xl font-bold text-neutral-800 font-heading mb-1">
                     {{ config('app.name') }}
                 </h1>
-                <p class="text-lg text-gray-600 font-medium">Yuk, Gabung dengan Kami! 🎉</p>
+                <p class="text-neutral-500">Pantau Tumbuh Kembang dengan Cinta</p>
             </div>
 
-            <!-- Register Card - Super cute -->
-            <div class="bg-white rounded-3xl shadow-2xl p-8 border-4 border-pink-200 relative">
-                <!-- Decorative corner -->
-                <div class="absolute top-0 left-0 text-6xl opacity-10 -mt-3 -ml-3">🌺</div>
-
-                <div class="relative z-10">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
-                        <span class="text-3xl">✨</span>
+            <!-- Register Card -->
+            <div class="card card-padding-lg">
+                <div class="mb-6">
+                    <h2 class="text-xl font-semibold text-neutral-800 font-heading">
                         Daftar Akun Baru
                     </h2>
-                    <p class="text-sm text-gray-600 mb-6">Gratis! Isi formulir di bawah untuk memulai</p>
+                    <p class="text-sm text-neutral-500 mt-1">Isi formulir di bawah untuk membuat akun</p>
+                </div>
 
-                    @if ($errors->any())
-                    <div
-                        class="mb-6 p-5 rounded-2xl bg-gradient-to-r from-red-50 to-rose-50 border-3 border-red-300 shadow-lg">
-                        <div class="flex items-start gap-3 mb-3">
-                            <span class="text-3xl">⚠️</span>
-                            <div class="font-bold text-red-800 text-lg">Ups! Ada yang perlu diperbaiki:</div>
+                @if ($errors->any())
+                <div class="mb-6 p-4 rounded-lg bg-red-50 border border-red-200">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <p class="text-sm font-medium text-red-700 mb-1">Terjadi kesalahan</p>
+                            <ul class="text-sm text-red-600 space-y-0.5">
+                                @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
                         </div>
-                        <ul class="text-sm space-y-1 ml-12">
-                            @foreach ($errors->all() as $error)
-                            <li class="flex items-start gap-2 text-red-700">
-                                <span class="text-red-500">•</span>
-                                <span>{{ $error }}</span>
-                            </li>
-                            @endforeach
-                        </ul>
                     </div>
-                    @endif
+                </div>
+                @endif
 
-                    <form method="POST" action="{{ route('register') }}" class="space-y-5">
-                        @csrf
+                <form method="POST" action="{{ route('register') }}" class="space-y-5">
+                    @csrf
 
-                        <!-- Nama -->
-                        <div>
-                            <label for="name" class="form-label">
-                                <span class="text-lg">👤</span>
-                                Nama Lengkap
-                            </label>
-                            <input type="text" id="name" name="name" value="{{ old('name') }}" required autofocus
-                                class="input-field @error('name') input-error @enderror"
-                                placeholder="contoh: Siti Nurhaliza">
-                            @error('name')
-                            <p class="error-message">
-                                <span>⚠️</span>
-                                <span>{{ $message }}</span>
-                            </p>
-                            @enderror
-                            <p class="form-helper">
-                                <span>💡</span>
-                                <span>Tulis nama lengkap sesuai identitas</span>
-                            </p>
-                        </div>
+                    <!-- Nama -->
+                    <div class="space-y-1.5">
+                        <label for="name" class="input-label">Nama Lengkap</label>
+                        <input type="text" id="name" name="name" value="{{ old('name') }}" required autofocus
+                            class="input-field @error('name') input-error @enderror"
+                            placeholder="Masukkan nama lengkap">
+                        @error('name')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                        <p class="text-xs text-neutral-500 mt-1">Tulis nama lengkap sesuai identitas</p>
+                    </div>
 
-                        <!-- Email -->
-                        <div>
-                            <label for="email" class="form-label">
-                                <span class="text-lg">📧</span>
-                                Email
-                            </label>
-                            <input type="email" id="email" name="email" value="{{ old('email') }}" required
-                                class="input-field @error('email') input-error @enderror"
-                                placeholder="contoh: siti@email.com">
-                            @error('email')
-                            <p class="error-message">
-                                <span>⚠️</span>
-                                <span>{{ $message }}</span>
-                            </p>
-                            @enderror
-                            <p class="form-helper">
-                                <span>💡</span>
-                                <span>Gunakan email aktif yang bisa dihubungi</span>
-                            </p>
-                        </div>
+                    <!-- Email -->
+                    <div class="space-y-1.5">
+                        <label for="email" class="input-label">Email</label>
+                        <input type="email" id="email" name="email" value="{{ old('email') }}" required
+                            class="input-field @error('email') input-error @enderror" placeholder="nama@email.com">
+                        @error('email')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                        <p class="text-xs text-neutral-500 mt-1">Gunakan email aktif yang bisa dihubungi</p>
+                    </div>
 
-                        <!-- Role -->
-                        <div>
-                            <label for="role" class="form-label">
-                                <span class="text-lg">🎯</span>
-                                Peran / Jabatan
-                            </label>
-                            <select id="role" name="role" required
-                                class="input-field @error('role') input-error @enderror">
-                                <option value="">-- Pilih peran kamu --</option>
-                                <option value="kader" {{ old('role') == 'kader' ? 'selected' : '' }}>
-                                    👥 Kader Posyandu
-                                </option>
-                                <option value="puskesmas" {{ old('role') == 'puskesmas' ? 'selected' : '' }}>
-                                    🏥 Pengelola Puskesmas
-                                </option>
-                                <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>
-                                    👑 Admin Dinas
-                                </option>
-                            </select>
-                            @error('role')
-                            <p class="error-message">
-                                <span>⚠️</span>
-                                <span>{{ $message }}</span>
-                            </p>
-                            @enderror
-                            <p class="form-helper">
-                                <span>💡</span>
-                                <span>Pilih sesuai dengan posisi kamu saat ini</span>
-                            </p>
-                        </div>
+                    <!-- Role -->
+                    <div class="space-y-1.5">
+                        <label for="role" class="input-label">Peran / Jabatan</label>
+                        <select id="role" name="role" required class="input-field @error('role') input-error @enderror">
+                            <option value="">Pilih peran Anda</option>
+                            <option value="kader" {{ old('role')=='kader' ? 'selected' : '' }}>Kader Posyandu</option>
+                            <option value="puskesmas" {{ old('role')=='puskesmas' ? 'selected' : '' }}>Pengelola
+                                Puskesmas</option>
+                            <option value="admin" {{ old('role')=='admin' ? 'selected' : '' }}>Admin Dinas</option>
+                        </select>
+                        @error('role')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                        <p class="text-xs text-neutral-500 mt-1">Pilih sesuai dengan posisi Anda saat ini</p>
+                    </div>
 
-                        <!-- Password -->
-                        <div>
-                            <label for="password" class="form-label">
-                                <span class="text-lg">🔒</span>
-                                Password
-                            </label>
-                            <input type="password" id="password" name="password" required
-                                class="input-field @error('password') input-error @enderror"
-                                placeholder="Minimal 8 karakter">
-                            @error('password')
-                            <p class="error-message">
-                                <span>⚠️</span>
-                                <span>{{ $message }}</span>
-                            </p>
-                            @enderror
-                            <p class="form-helper">
-                                <span>💡</span>
-                                <span>Buat password yang kuat & mudah diingat</span>
-                            </p>
-                        </div>
+                    <!-- Password -->
+                    <div class="space-y-1.5">
+                        <label for="password" class="input-label">Password</label>
+                        <input type="password" id="password" name="password" required
+                            class="input-field @error('password') input-error @enderror"
+                            placeholder="Minimal 8 karakter">
+                        @error('password')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                        <p class="text-xs text-neutral-500 mt-1">Buat password yang kuat & mudah diingat</p>
+                    </div>
 
-                        <!-- Confirm Password -->
-                        <div>
-                            <label for="password_confirmation" class="form-label">
-                                <span class="text-lg">🔐</span>
-                                Konfirmasi Password
-                            </label>
-                            <input type="password" id="password_confirmation" name="password_confirmation" required
-                                class="input-field" placeholder="Ketik ulang password yang sama">
-                            <p class="form-helper">
-                                <span>💡</span>
-                                <span>Pastikan password sama dengan yang di atas</span>
-                            </p>
-                        </div>
+                    <!-- Confirm Password -->
+                    <div class="space-y-1.5">
+                        <label for="password_confirmation" class="input-label">Konfirmasi Password</label>
+                        <input type="password" id="password_confirmation" name="password_confirmation" required
+                            class="input-field" placeholder="Ketik ulang password">
+                        <p class="text-xs text-neutral-500 mt-1">Pastikan sama dengan password di atas</p>
+                    </div>
 
-                        <!-- Info Box -->
-                        <div class="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl border-2 border-blue-200">
-                            <div class="flex items-start gap-3 text-sm text-gray-700">
-                                <span class="text-2xl flex-shrink-0">ℹ️</span>
-                                <div>
-                                    <p class="font-semibold mb-1">Kenapa harus daftar?</p>
-                                    <ul class="space-y-1 text-xs">
-                                        <li class="flex items-center gap-1">
-                                            <span>✅</span>
-                                            <span>Data tersimpan aman di cloud</span>
-                                        </li>
-                                        <li class="flex items-center gap-1">
-                                            <span>✅</span>
-                                            <span>Akses dari mana saja</span>
-                                        </li>
-                                        <li class="flex items-center gap-1">
-                                            <span>✅</span>
-                                            <span>Pantau tumbuh kembang real-time</span>
-                                        </li>
-                                    </ul>
-                                </div>
+                    <!-- Info Box -->
+                    <div class="p-4 rounded-lg bg-blue-50 border border-blue-200">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <div>
+                                <p class="text-sm font-medium text-blue-800 mb-1">Keuntungan mendaftar:</p>
+                                <ul class="text-xs text-blue-700 space-y-0.5">
+                                    <li class="flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        Data tersimpan aman di cloud
+                                    </li>
+                                    <li class="flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        Akses dari mana saja
+                                    </li>
+                                    <li class="flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        Pantau tumbuh kembang real-time
+                                    </li>
+                                </ul>
                             </div>
                         </div>
-
-                        <!-- Submit Button -->
-                        <button type="submit" class="btn-primary w-full text-lg flex items-center justify-center gap-2">
-                            <span>🚀</span>
-                            <span>Daftar Sekarang</span>
-                        </button>
-                    </form>
-
-                    <!-- Divider -->
-                    <div class="relative my-8">
-                        <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t-2 border-pink-200"></div>
-                        </div>
-                        <div class="relative flex justify-center text-sm">
-                            <span class="px-4 bg-white text-gray-500 font-medium">atau</span>
-                        </div>
                     </div>
 
-                    <!-- Login Link -->
-                    <div
-                        class="text-center p-5 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl border-3 border-purple-200">
-                        <p class="text-gray-700 mb-3 font-semibold flex items-center justify-center gap-2">
-                            <span class="text-2xl">👋</span>
-                            <span>Sudah punya akun?</span>
-                        </p>
-                        <a href="{{ route('login') }}"
-                            class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all">
-                            <span>🔑</span>
-                            <span>Masuk di Sini</span>
-                        </a>
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn-primary w-full">
+                        Daftar Sekarang
+                    </button>
+                </form>
+
+                <!-- Divider -->
+                <div class="relative my-6">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-neutral-200"></div>
                     </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-3 bg-white text-neutral-400">atau</span>
+                    </div>
+                </div>
+
+                <!-- Login Link -->
+                <div class="text-center">
+                    <p class="text-sm text-neutral-600 mb-3">Sudah punya akun?</p>
+                    <a href="{{ route('login') }}" class="btn-secondary w-full">
+                        Masuk di Sini
+                    </a>
                 </div>
             </div>
 
             <!-- Footer -->
-            <div class="text-center mt-8 space-y-2">
-                <p class="text-sm text-gray-600 font-medium flex items-center justify-center gap-2">
-                    <span>Made with</span>
-                    <span class="text-red-500 text-xl">❤️</span>
-                    <span>© {{ date('Y') }}</span>
+            <div class="text-center mt-6">
+                <p class="text-xs text-neutral-400">
+                    © {{ date('Y') }} {{ config('app.name') }} · Dinas Ketahanan Pangan Kab. Muara Enim
                 </p>
-                <p class="text-xs text-gray-500">{{ config('app.name') }} - Dinas Ketahanan Pangan Kab. Muara Enim</p>
             </div>
         </div>
     </div>

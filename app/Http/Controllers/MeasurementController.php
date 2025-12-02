@@ -49,7 +49,7 @@ class MeasurementController extends Controller
             ->when($childId, fn($q) => $q->where('child_id', $childId))
             ->with(['child.mother', 'child.posyandu'])
             ->orderByDesc('measured_at')
-            ->simplePaginate(15)
+            ->paginate(15)
             ->appends($request->query());
 
         $children = Child::query()
@@ -65,14 +65,23 @@ class MeasurementController extends Controller
     {
         $accessiblePosyanduIds = $this->getAccessiblePosyanduIds();
 
+        // Load children with mother relation for searchable dropdown
         $children = Child::query()
+            ->with('mother:id,name')
             ->when($accessiblePosyanduIds !== null, fn($q) => $q->whereIn('posyandu_id', $accessiblePosyanduIds))
             ->orderBy('name')
-            ->get(['id', 'name']);
+            ->get(['id', 'name', 'mother_id', 'gender']);
 
         $prefillChildId = $request->integer('child_id') ?: null;
 
-        return view('measurements.create', compact('children', 'prefillChildId'));
+        // Find prefilled child name for searchable dropdown
+        $prefillChildName = '';
+        if ($prefillChildId) {
+            $prefillChild = $children->firstWhere('id', $prefillChildId);
+            $prefillChildName = $prefillChild ? $prefillChild->name : '';
+        }
+
+        return view('measurements.create', compact('children', 'prefillChildId', 'prefillChildName'));
     }
 
     // POST /measurements
@@ -124,7 +133,13 @@ class MeasurementController extends Controller
             ));
         }
 
-        return redirect()->route('children.show', $child)->with('success', 'Pengukuran berhasil disimpan.');
+        // Redirect to create page with success message and option to measure another child
+        return redirect()
+            ->route('measurements.create')
+            ->with('success', 'Pengukuran berhasil disimpan!')
+            ->with('show_next_options', true)
+            ->with('last_child_name', $child->name)
+            ->with('last_child_id', $child->id);
     }
 
     // GET /measurements/{measurement}
@@ -153,9 +168,10 @@ class MeasurementController extends Controller
         }
 
         $children = Child::query()
+            ->with('mother:id,name')
             ->when($accessiblePosyanduIds !== null, fn($q) => $q->whereIn('posyandu_id', $accessiblePosyanduIds))
             ->orderBy('name')
-            ->get(['id', 'name']);
+            ->get(['id', 'name', 'mother_id', 'gender']);
 
         return view('measurements.edit', compact('measurement', 'children'));
     }

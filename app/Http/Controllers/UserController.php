@@ -49,7 +49,7 @@ class UserController extends Controller
             ->when($puskesmasId && $accessiblePuskesmasId === null, fn($qb) => $qb->where('puskesmas_id', $puskesmasId))
             ->with('puskesmas')
             ->orderBy('name')
-            ->simplePaginate(15)
+            ->paginate(15)
             ->appends($request->query());
 
         // Only show filters for admin
