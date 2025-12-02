@@ -8,8 +8,28 @@
             <h1 class="page-title">Resep Makanan Sehat</h1>
             <p class="page-subtitle">Kumpulan resep bergizi untuk tumbuh kembang optimal</p>
         </div>
+        @if(in_array(auth()->user()->role, ['admin', 'puskesmas']))
+        <a href="{{ route('recipes.create') }}" class="btn-primary">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Tambah Resep
+        </a>
+        @endif
     </div>
 </div>
+
+<!-- Success Message -->
+@if(session('success'))
+<div class="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+    <div class="flex items-center gap-3">
+        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <p class="text-green-800">{{ session('success') }}</p>
+    </div>
+</div>
+@endif
 
 <!-- Filter Section -->
 <div class="card card-padding mb-6">
@@ -73,6 +93,14 @@
             Belum ada resep yang dipublikasikan saat ini.
             @endif
         </p>
+        @if(in_array(auth()->user()->role, ['admin', 'puskesmas']))
+        <a href="{{ route('recipes.create') }}" class="btn-primary inline-flex">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Tambah Resep Pertama
+        </a>
+        @endif
     </div>
 </div>
 @else
@@ -95,67 +123,85 @@
 <!-- Recipe Grid -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     @foreach ($items as $item)
-    <a href="{{ route('recipes.show', $item) }}" class="card overflow-hidden group">
-        <!-- Image -->
-        <div class="h-48 bg-neutral-100 flex items-center justify-center overflow-hidden">
-            @if ($item->image_path)
-            <img src="{{ asset($item->image_path) }}" alt="{{ $item->title }}"
-                class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300">
-            @else
-            <div class="flex flex-col items-center justify-center text-neutral-400">
-                <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    <div class="card overflow-hidden group relative">
+        <a href="{{ route('recipes.show', $item) }}" class="block">
+            <!-- Image -->
+            <div class="h-48 bg-neutral-100 flex items-center justify-center overflow-hidden">
+                @if ($item->image_path)
+                <img src="{{ asset($item->image_path) }}" alt="{{ $item->title }}"
+                    class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300">
+                @else
+                <div class="flex flex-col items-center justify-center text-neutral-400">
+                    <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span class="text-sm">Tidak ada gambar</span>
+                </div>
+                @endif
+            </div>
+
+            <!-- Content -->
+            <div class="p-4">
+                <div class="flex items-center gap-2 mb-2">
+                    @php
+                    $categoryColors = [
+                    'mpasi_6_12' => 'badge-primary',
+                    'balita_1_3' => 'badge-info',
+                    'anak_3_5' => 'badge-success',
+                    ];
+                    $categoryClass = $categoryColors[$item->age_category] ?? 'badge-neutral';
+                    @endphp
+                    <span class="badge {{ $categoryClass }}">
+                        {{ $ageCategories[$item->age_category] ?? ucfirst(str_replace('_',' ',$item->age_category)) }}
+                    </span>
+                    @if(!$item->is_published)
+                    <span class="badge badge-warning">Draft</span>
+                    @endif
+                </div>
+
+                <h3 class="font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">
+                    {{ $item->title }}
+                </h3>
+
+                @if($item->calories || $item->protein)
+                <div class="flex items-center gap-3 mt-3 text-xs text-neutral-500">
+                    @if($item->calories)
+                    <span class="flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+                        </svg>
+                        {{ $item->calories }} kkal
+                    </span>
+                    @endif
+                    @if($item->protein)
+                    <span class="flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        {{ $item->protein }}g protein
+                    </span>
+                    @endif
+                </div>
+                @endif
+            </div>
+        </a>
+
+        <!-- Admin/Puskesmas Actions -->
+        @if(in_array(auth()->user()->role, ['admin', 'puskesmas']))
+        <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <a href="{{ route('recipes.edit', $item) }}"
+                class="p-2 bg-white rounded-lg shadow-md hover:bg-primary-50 text-primary-600" title="Edit">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
-                <span class="text-sm">Tidak ada gambar</span>
-            </div>
-            @endif
+            </a>
         </div>
-
-        <!-- Content -->
-        <div class="p-4">
-            <div class="flex items-center gap-2 mb-2">
-                @php
-                $categoryColors = [
-                'mpasi_6_12' => 'badge-primary',
-                'balita_1_3' => 'badge-info',
-                'anak_3_5' => 'badge-success',
-                ];
-                $categoryClass = $categoryColors[$item->age_category] ?? 'badge-neutral';
-                @endphp
-                <span class="badge {{ $categoryClass }}">
-                    {{ $ageCategories[$item->age_category] ?? ucfirst(str_replace('_',' ',$item->age_category)) }}
-                </span>
-            </div>
-
-            <h3 class="font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">
-                {{ $item->title }}
-            </h3>
-
-            @if($item->calories || $item->protein)
-            <div class="flex items-center gap-3 mt-3 text-xs text-neutral-500">
-                @if($item->calories)
-                <span class="flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
-                    </svg>
-                    {{ $item->calories }} kkal
-                </span>
-                @endif
-                @if($item->protein)
-                <span class="flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                    {{ $item->protein }}g protein
-                </span>
-                @endif
-            </div>
-            @endif
-        </div>
-    </a>
+        @endif
+    </div>
     @endforeach
 </div>
 

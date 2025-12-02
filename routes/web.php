@@ -36,7 +36,14 @@ Route::middleware('auth')->group(function () {
     // Growth chart (WHO) per anak
     Route::get('/children/{child}/growth-chart', [GrowthChartController::class, 'show'])->name('growth-chart.show');
 
+    // Recipes - semua user bisa lihat
     Route::resource('recipes', RecipeController::class)->only(['index', 'show']);
+
+    // Recipes management - hanya admin dan puskesmas
+    Route::middleware(['role:admin,puskesmas'])->group(function () {
+        Route::resource('recipes', RecipeController::class)->only(['create', 'store', 'edit', 'update', 'destroy']);
+    });
+
     Route::resource('growth-standards', GrowthStandardController::class)->only(['index', 'show']);
     // });
 });

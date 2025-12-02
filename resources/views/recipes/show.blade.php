@@ -21,14 +21,53 @@ $categoryColors = [
             <h1 class="page-title">{{ $recipe->title }}</h1>
             <p class="page-subtitle">Detail resep makanan sehat</p>
         </div>
-        <a href="{{ route('recipes.index') }}" class="btn-secondary">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Kembali
-        </a>
+        <div class="flex items-center gap-2">
+            @if(in_array(auth()->user()->role, ['admin', 'puskesmas']))
+            <a href="{{ route('recipes.edit', $recipe) }}" class="btn-secondary">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Edit
+            </a>
+            <form method="post" action="{{ route('recipes.destroy', $recipe) }}" class="inline"
+                onsubmit="return confirm('Apakah Anda yakin ingin menghapus resep ini?')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn-danger">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Hapus
+                </button>
+            </form>
+            @endif
+            <a href="{{ route('recipes.index') }}" class="btn-secondary">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Kembali
+            </a>
+        </div>
     </div>
 </div>
+
+<!-- Draft Notice for Admin/Puskesmas -->
+@if(!$recipe->is_published && in_array(auth()->user()->role, ['admin', 'puskesmas']))
+<div class="mb-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
+    <div class="flex items-center gap-3">
+        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <p class="text-amber-800">
+            <strong>Resep ini belum dipublikasikan.</strong> Hanya admin dan puskesmas yang dapat melihatnya.
+        </p>
+    </div>
+</div>
+@endif
 
 <!-- Recipe Content -->
 <div class="card overflow-hidden">
@@ -51,10 +90,13 @@ $categoryColors = [
         <!-- Content Section -->
         <div class="md:w-3/5 p-6">
             <!-- Category Badge -->
-            <div class="mb-4">
+            <div class="mb-4 flex items-center gap-2">
                 <span class="badge {{ $categoryColors[$recipe->age_category] ?? 'badge-neutral' }}">
                     {{ $ageMap[$recipe->age_category] ?? ucfirst(str_replace('_',' ',$recipe->age_category)) }}
                 </span>
+                @if(!$recipe->is_published)
+                <span class="badge badge-warning">Draft</span>
+                @endif
             </div>
 
             <!-- Title -->
@@ -98,6 +140,15 @@ $categoryColors = [
                 </div>
                 @endif
             </div>
+
+            <!-- Creator Info (for Admin/Puskesmas) -->
+            @if(in_array(auth()->user()->role, ['admin', 'puskesmas']) && $recipe->creator)
+            <div class="text-sm text-neutral-500 border-t border-neutral-200 pt-4">
+                <p>Dibuat oleh: <span class="font-medium text-neutral-700">{{ $recipe->creator->name }}</span></p>
+                <p>Tanggal: <span
+                        class="font-medium text-neutral-700">{{ $recipe->created_at->format('d M Y, H:i') }}</span></p>
+            </div>
+            @endif
         </div>
     </div>
 </div>
