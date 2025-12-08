@@ -25,6 +25,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+    Route::get('/profile', [AuthController::class, 'profile'])->name('profile');
     // Resources dengan middleware role (uncomment saat production)
     // Route::middleware(['role:admin,puskesmas,kader'])->group(function () {
     Route::resource('posyandu', PosyanduController::class);

@@ -11,7 +11,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="min-h-screen bg-gradient-girly relative overflow-hidden">
+<body class="min-h-screen bg-gradient-girly relative overflow-x-hidden">
     <!-- 🌸 Decorative Background Elements -->
     <div class="fixed inset-0 pointer-events-none overflow-hidden">
         <div class="decorative-blob w-96 h-96 bg-primary-200 top-0 -right-48 animate-float"></div>
@@ -20,8 +20,8 @@
         <div class="decorative-blob w-48 h-48 bg-warm-200 bottom-1/4 right-10" style="animation-delay: 3s;"></div>
     </div>
 
-    <div class="min-h-screen flex items-center justify-center px-4 py-12 relative z-10">
-        <div class="w-full max-w-md">
+    <div class="min-h-screen flex items-center justify-center px-4 py-8 sm:py-12 relative z-10 overflow-y-auto">
+        <div class="w-full max-w-md pb-10">
             <!-- Logo & Header -->
             <div class="text-center mb-8">
                 <div
@@ -39,7 +39,7 @@
             </div>
 
             <!-- Login Card -->
-            <div class="card-cute p-8">
+            <div class="card-cute p-6 sm:p-8">
                 <div class="mb-6 text-center">
                     <h2 class="text-xl font-bold text-neutral-800 font-heading">
                         Selamat Datang Kembali! 👋
@@ -136,7 +136,7 @@
             </div>
 
             <!-- Footer -->
-            <div class="text-center mt-8">
+            <div class="text-center mt-6 sm:mt-8">
                 <div class="flex items-center justify-center gap-2 text-neutral-500 font-medium mb-2">
                     <span>Made with</span>
                     <svg class="w-5 h-5 text-primary-400 animate-pulse" fill="currentColor" viewBox="0 0 24 24">

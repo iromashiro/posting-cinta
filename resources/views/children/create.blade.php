@@ -195,6 +195,7 @@
                 <input type="date" name="date_of_birth" value="{{ old('date_of_birth') }}"
                     class="input-field @error('date_of_birth') input-error @enderror">
                 <p class="input-helper">Tanggal lahir sesuai akta kelahiran</p>
+                <p class="input-helper text-xs text-neutral-500">Format tanggal: DD-MM-YYYY (contoh: 31-12-2025)</p>
                 @error('date_of_birth') <p class="error-message">{{ $message }}</p> @enderror
             </div>
         </div>

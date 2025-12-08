@@ -93,8 +93,8 @@
 </div>
 
 <!-- Table -->
-<div class="card overflow-hidden">
-    <table class="table-premium">
+<div class="card overflow-hidden overflow-x-auto">
+    <table class="table-premium min-w-[900px]">
         <thead>
             <tr>
                 <th>Indikator</th>

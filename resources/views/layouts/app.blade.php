@@ -242,6 +242,16 @@
                     </a>
                 </div>
 
+                <a href="{{ route('profile') }}"
+                    class="sidebar-link {{ request()->routeIs('profile') ? 'active' : '' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M5.121 17.804A4 4 0 0112 15a4 4 0 016.879 2.804M15 11a3 3 0 10-6 0 3 3 0 006 0z" />
+                    </svg>
+                    <span>Profil Saya</span>
+                    <span class="ml-auto text-xs">💁‍♀️</span>
+                </a>
+
                 <!-- Logout -->
                 <div class="p-3 border-t border-primary-100 bg-gradient-to-r from-red-50/50 to-warm-50/50">
                     <form method="POST" action="{{ route('logout') }}">

@@ -101,7 +101,8 @@ class MeasurementController extends Controller
         $measuredAt = Carbon::parse($data['measured_at'])->startOfDay();
         $dob = Carbon::parse($child->date_of_birth)->startOfDay();
         $ageMonths = $dob->diffInMonths($measuredAt);
-        $data['age_months'] = $ageMonths;
+        // Pastikan age_months tersimpan sebagai integer di database
+        $data['age_months'] = (int) round($ageMonths);
 
         // Compute z-scores based on WHO LMS
         [$wfaZ, $hfaZ, $wfhZ] = $this->computeZScores(
@@ -198,7 +199,8 @@ class MeasurementController extends Controller
         $measuredAt = Carbon::parse($data['measured_at'])->startOfDay();
         $dob = Carbon::parse($child->date_of_birth)->startOfDay();
         $ageMonths = $dob->diffInMonths($measuredAt);
-        $data['age_months'] = $ageMonths;
+        // Pastikan age_months tersimpan sebagai integer di database
+        $data['age_months'] = (int) round($ageMonths);
 
         [$wfaZ, $hfaZ, $wfhZ] = $this->computeZScores(
             gender: $child->gender,

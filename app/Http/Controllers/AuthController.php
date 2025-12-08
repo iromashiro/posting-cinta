@@ -92,6 +92,19 @@ class AuthController extends Controller
     }
 
     /**
+     * Tampilkan profil pengguna yang sedang login.
+     */
+    public function profile()
+    {
+        $user = Auth::user()->load('puskesmas');
+
+        return view('auth.profile', [
+            'header' => 'Profil Saya',
+            'user' => $user,
+        ]);
+    }
+
+    /**
      * Logout
      */
     public function logout(Request $request)
